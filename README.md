@@ -20,24 +20,24 @@ A Safira WAMGIA é dividida em módulos bem definidos, utilizando Docker Compose
 
 ## 📂 Estrutura do Repositório
 safira-wamgia/ 
-├── ai-functions # Funções personalizadas de IA 
-├── backup # Serviços de backup 
-├── csm # Serviço para Speech Synthesis (TTS) 
-├── docs # Documentação via MkDocs 
-├── image 
-│ ├── input # Processamento de imagens (OCR) 
-│ └── output # Geração de imagens via IA 
-├── loki # Configuração do Loki para logging centralizado 
-├── prometheus # Monitoramento de métricas 
-├── traefik # Gateway e proxy reverso 
-├── venom # Integração WhatsApp (Venom-bot) 
-├── voice 
-│ └── input # Speech Recognition (STT) 
-├── shared # Recursos compartilhados entre serviços 
-├── .env # Variáveis de ambiente (template) 
-├── docker-compose.yml # Orquestrador principal 
-├── run.sh # Script principal de execução 
-├── setup.sh # Configuração inicial automatizada 
+├── ai-functions # Funções personalizadas de IA
+├── backup # Serviços de backup
+├── csm # Serviço para Speech Synthesis (TTS)
+├── docs # Documentação via MkDocs
+├── image
+│ ├── input # Processamento de imagens (OCR)
+│ └── output # Geração de imagens via IA
+├── loki # Configuração do Loki para logging centralizado
+├── prometheus # Monitoramento de métricas
+├── traefik # Gateway e proxy reverso
+├── venom # Integração WhatsApp (Venom-bot)
+├── voice
+│ └── input # Speech Recognition (STT)
+├── shared # Recursos compartilhados entre serviços
+├── .env # Variáveis de ambiente (template)
+├── docker-compose.yml # Orquestrador principal
+├── run.sh # Script principal de execução
+├── setup.sh # Configuração inicial automatizada
 └── secrets.sh # Gestão de secrets Docker
 
 
