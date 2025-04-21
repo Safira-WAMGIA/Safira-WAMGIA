@@ -1,17 +1,24 @@
 # 🔷 Safira WAMGIA
 
-**Safira WAMGIA** é uma plataforma integrada de automação e inteligência artificial voltada para assistentes pessoais, interações multimodais e automação de fluxos, com o WhatsApp como principal canal. O projeto utiliza tecnologias robustas como Docker, N8N, FastAPI, LLaMA, Venom-bot e Ollama, organizadas em uma arquitetura de microsserviços para escalabilidade, modularidade e facilidade de manutenção.
+![Build Status](https://img.shields.io/github/actions/workflow/status/caioross/Safira-WAMGIA/safira-ci.yml?branch=main)
+![Docker Pulls](https://img.shields.io/docker/pulls/caioross/safira-wamgia)
+![License](https://img.shields.io/badge/license-Proprietary-red)
+
+**Safira WAMGIA** é uma plataforma integrada de automação e inteligência artificial projetada para assistentes pessoais, interações multimodais e automação de fluxos, com o WhatsApp como principal canal de comunicação. A plataforma utiliza uma arquitetura baseada em microsserviços, garantindo escalabilidade, modularidade e facilidade de manutenção.
 
 ---
 
 ## 🚀 Visão Geral da Arquitetura
 
-A plataforma é estruturada em módulos bem definidos, utilizando **Docker Compose** para orquestração de containers e isolamento do ambiente. A stack inclui:
+A **Safira WAMGIA** é estruturada em módulos independentes, utilizando **Docker Compose** para orquestração de containers e isolamento de ambiente. A stack completa inclui:
 
 - **Bases de Dados**: PostgreSQL, Redis, MinIO (Object Storage)
 - **Orquestração e Gateway**: Traefik
 - **Core Workflow**: N8N
-- **IA e Serviços**: LLaMA (Ollama), Venom (WhatsApp), FastAPI (CSM, TTS/STT, Image Processing)
+- **IA e Serviços**:
+  - LLaMA (Ollama): Modelos locais de IA para NLP
+  - Venom-bot: Integração com WhatsApp
+  - FastAPI: Backend para CSM, TTS/STT e processamento de imagens
 - **Observabilidade**: Prometheus, Grafana, Loki
 - **CI/CD**: Jenkins, GitHub Actions
 - **Apps de Gestão**: Jira Software
@@ -47,85 +54,73 @@ safira-wamgia/
 
 ## 🛠️ Pré-requisitos
 
-- **Docker** >= 24.x
-- **Docker Compose Plugin** >= 2.20.x
-- **Bash** >= 5.x (para os scripts de execução e setup)
-- **Git** >= 2.x
+Certifique-se de que você possui as seguintes dependências instaladas antes de continuar:
+
+- **Docker**: >= 24.x
+- **Docker Compose Plugin**: >= 2.20.x
+- **Bash**: >= 5.x
+- **Git**: >= 2.x
 
 ---
 
 ## ⚙️ Setup Inicial
 
-Clone o repositório e configure o ambiente automaticamente:
+Para configurar e iniciar o ambiente, siga as instruções abaixo:
 
-```bash
-git clone <repo-url>
-cd safira-wamgia
-chmod +x setup.sh run.sh secrets.sh
-./setup.sh
-./secrets.sh
-```
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/caioross/Safira-WAMGIA.git
+   cd safira-wamgia
+   ```
 
-> 🚨 **Nota**: Se estiver usando o Docker em modo Swarm, os secrets serão criados automaticamente. Para desenvolvimento local, utilize a opção `--dev`.
+2. Configure os scripts:
+   ```bash
+   chmod +x setup.sh run.sh secrets.sh
+   ./setup.sh
+   ./secrets.sh
+   ```
+
+> 🚨 **Nota**: Em ambientes Docker Swarm, os secrets serão configurados automaticamente. Para desenvolvimento local, utilize a flag `--dev`.
 
 ---
 
-## 🐳 Executando a Aplicação
+## 🐳 Gerenciamento de Serviços com Docker
 
-Utilize o script `run.sh` para gerenciar a stack Safira:
+Use o script `run.sh` para gerenciar facilmente a stack Safira:
 
-- **Subir todos os serviços:**
-  ```bash
-  ./run.sh up
-  ```
-
-- **Parar todos os serviços:**
-  ```bash
-  ./run.sh down
-  ```
-
-- **Reiniciar a stack completa:**
-  ```bash
-  ./run.sh restart
-  ```
-
-- **Consultar o status atual da stack:**
-  ```bash
-  ./run.sh status
-  ```
-
-- **Visualizar logs de um serviço específico:**
-  ```bash
-  ./run.sh logs <nome-serviço> --save
-  ```
+| Comando                       | Descrição                                    |
+|-------------------------------|----------------------------------------------|
+| `./run.sh up`                 | Subir todos os serviços                     |
+| `./run.sh down`               | Parar todos os serviços                     |
+| `./run.sh restart`            | Reiniciar a stack completa                  |
+| `./run.sh status`             | Consultar o status atual da stack           |
+| `./run.sh logs <serviço>`     | Exibir logs de um serviço específico (com `--save` para salvar os logs) |
 
 ---
 
 ## 🧩 Componentes e Endpoints
 
-| Componente          | Descrição                           | Endpoint                      |
-|---------------------|-----------------------------------|-------------------------------|
-| **N8N Core**        | Workflow automation principal    | [http://localhost:5678](http://localhost:5678) |
-| **N8N Admin**       | Administração separada de workflows | [http://localhost:5680](http://localhost:5680) |
-| **Venom API**       | Integração com WhatsApp          | [http://localhost:3001](http://localhost:3001) |
-| **Ollama (LLaMA)**  | Modelos locais de IA para NLP    | [http://localhost:11434](http://localhost:11434) |
-| **MinIO**           | Armazenamento de objetos (S3)    | [http://localhost:9001](http://localhost:9001) |
-| **Grafana**         | Dashboard de métricas e logs     | [http://localhost:3000](http://localhost:3000) |
-| **Prometheus**      | Monitoramento de métricas        | [http://localhost:9090](http://localhost:9090) |
-| **Traefik**         | Gateway de acesso e proxy reverso | [http://localhost](http://localhost) |
+| **Componente**      | **Descrição**                          | **Endpoint**                    |
+|---------------------|----------------------------------------|----------------------------------|
+| **N8N Core**        | Workflow automation principal         | [http://localhost:5678](http://localhost:5678) |
+| **N8N Admin**       | Administração de workflows            | [http://localhost:5680](http://localhost:5680) |
+| **Venom API**       | Integração com WhatsApp               | [http://localhost:3001](http://localhost:3001) |
+| **Ollama (LLaMA)**  | Modelos locais de IA para NLP         | [http://localhost:11434](http://localhost:11434) |
+| **MinIO**           | Armazenamento de objetos (S3)         | [http://localhost:9001](http://localhost:9001) |
+| **Grafana**         | Dashboard para métricas e logs        | [http://localhost:3000](http://localhost:3000) |
+| **Prometheus**      | Monitoramento de métricas             | [http://localhost:9090](http://localhost:9090) |
+| **Traefik**         | Gateway de acesso e proxy reverso     | [http://localhost](http://localhost) |
 
 ---
 
 ## 🔐 Gestão de Secrets
 
-Secrets são gerenciados via **Docker Secrets** utilizando o script `secrets.sh`. Incluem:
+O script `secrets.sh` permite gerenciar os segredos da aplicação de forma segura. Segredos incluem:
 
-- Senhas PostgreSQL (Safira, Pagamento, Jira)
-- MinIO Root Password
-- Grafana Admin Password
-- JWT e secrets do Supabase
-- Redis Password
-- Jenkins Admin Password
+- Senhas do PostgreSQL (Safira, Pagamento, Jira)
+- Senhas do Redis e MinIO
+- Tokens JWT e secrets do Supabase
+- Senha do administrador do Grafana
 
 ### Gerar ou atualizar secrets:
 ```bash
@@ -136,79 +131,79 @@ Secrets são gerenciados via **Docker Secrets** utilizando o script `secrets.sh`
 
 ## 📖 Documentação
 
-A documentação técnica é gerada com **MkDocs**:
+A documentação técnica é gerada com **MkDocs**. Para visualizar:
 
 ```bash
 cd docs
 mkdocs serve
 ```
-
 Acesse a documentação em: [http://localhost:8000](http://localhost:8000).
 
 ---
 
-## 🔄 CI/CD e DevOps
+## 🔄 Integração Contínua (CI/CD)
 
-- **GitHub Actions**: Validação automática com lint, testes unitários e build de imagens Docker.
+- **GitHub Actions**: Pipelines de validação (linting, testes unitários e build de imagens Docker).
 - **Jenkins**: Pipelines avançados para integração e deployment contínuos.
-- **Watchtower**: Atualizações automáticas de containers.
 
 ---
 
 ## 📊 Observabilidade e Logs
 
-- **Métricas**: Monitoramento com Prometheus/Grafana.
-- **Logs Centralizados**: Utilização de Loki com visualização em Grafana.
+- **Métricas**: Monitoramento integrado com Prometheus e Grafana.
+- **Logs Centralizados**: Gerenciados pelo Loki com visualização em Grafana.
 
 ---
 
-## 📦 Implantação e Escalabilidade
+## ✨ Recursos Suportados
 
-- **Ambientes Recomendados**: Docker Swarm ou Kubernetes.
-- **Escalonamento Horizontal**: Suporte via replicação de containers.
-
----
-
-## 💡 Boas Práticas Adotadas
-
-- **SOLID**: Princípios aplicados na organização dos microsserviços.
-- **DRY**: Uso de anchors YAML para evitar repetição.
-- **Segurança**: Secrets isolados e seguros.
-- **Automação Completa**: Scripts idempotentes para setup e manutenção.
-- **Healthchecks**: Garantia de disponibilidade contínua.
+| **Recurso**                  | **Status**       | **Observação**                        |
+|------------------------------|------------------|---------------------------------------|
+| Integração WhatsApp (Venom)  | ✅ Concluído     |                                       |
+| Automação de Workflows (N8N) | ✅ Concluído     |                                       |
+| Suporte a Multi-idiomas      | 🚧 Em Progresso | PT-BR implementado; EN e ES pendentes |
+| Cache Inteligente            | ⬜ Planejado    |                                       |
+| Integração com Gateways      | ⬜ Planejado    |                                       |
 
 ---
 
-## 🤝 Contribuição e Issues
+## ❓ FAQ
 
-### Como contribuir:
-1. Faça um fork do projeto.
-2. Crie um branch para sua feature:
+**1. O que fazer se o Docker Compose falhar com um erro de rede?**  
+Verifique se o Docker está devidamente configurado e com privilégios administrativos. Reexecute o comando `docker-compose up` com a flag `--force-recreate`.
+
+**2. Como adicionar novos secrets ao projeto?**  
+Use o script `secrets.sh` para gerenciar novos secrets de forma segura.
+
+---
+
+## 🤝 Como Contribuir
+
+1. Faça um fork do projeto:
    ```bash
    git checkout -b feature/nova-funcionalidade
    ```
-3. Realize commits claros:
+
+2. Realize commits claros:
    ```bash
    git commit -m "Descrição concisa"
    ```
-4. Abra um pull request detalhado para revisão.
 
-### Reportar Issues:
-Utilize o sistema de Issues do GitHub para descrever problemas ou sugerir melhorias.
+3. Envie um pull request detalhado para revisão.
 
 ---
 
 ## 📜 Licença
 
-Este projeto é **Particular**.
+Este projeto é **Particular** e não está disponível para uso público sem autorização.
 
 ---
 
-## 🚩 Próximos Passos (Roadmap)
+## 🚩 Roadmap Futuro
 
-- [ ] Integração completa com gateways de pagamento.
 - [ ] Melhoria na arquitetura de filas e workers.
 - [ ] Implementação de caching inteligente.
+- [ ] Integração completa com gateways de pagamento.
 - [ ] Suporte multi-idioma completo (PT, EN, ES).
 - [ ] Expansão para serviços cloud (AWS/GCP/Azure).
 
