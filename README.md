@@ -1,7 +1,7 @@
 # 🔷 Safira WAMGIA
 
 ![Build Status](https://img.shields.io/github/actions/workflow/status/caioross/Safira-WAMGIA/safira-ci.yml?branch=main)
-![Docker Pulls](https://img.shields.io/docker/pulls/caioross/safira-wamgia)
+![Docker Pulls](https://img.shields.io/docker/pulls/caioross/Safira-WAMGIA)
 ![License](https://img.shields.io/badge/license-Proprietary-red)
 
 **Safira WAMGIA** é uma plataforma integrada de automação e inteligência artificial projetada para assistentes pessoais, interações multimodais e automação de fluxos, com o WhatsApp como principal canal de comunicação. A plataforma utiliza uma arquitetura baseada em microsserviços, garantindo escalabilidade, modularidade e facilidade de manutenção.
