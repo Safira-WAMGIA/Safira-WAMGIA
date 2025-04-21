@@ -1,0 +1,13 @@
+on:
+  push:
+    branches:
+      - 'release/**'
+
+jobs:
+  build-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Docker containers
+        run: docker compose -f docker-compose.yml up --build -d
