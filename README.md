@@ -91,37 +91,37 @@ Utilize o run.sh para controlar a stack Safira facilmente:
 
 ## 🧩 Componentes e Endpoints
 
-N8N Core (Safira)	
-http://localhost:5678	
-Workflow automation principal
+N8N Core (Safira)
+- http://localhost:5678
+- Workflow automation principal
 
-Admin (N8N)	
-http://localhost:5680	
-Administração separada de workflows
+Admin (N8N)
+- http://localhost:5680
+- Administração separada de workflows
 
-Venom API	
-http://localhost:3001	
-API de integração com WhatsApp
+Venom API
+- http://localhost:3001
+- API de integração com WhatsApp
 
-Ollama (LLaMA)	
-http://localhost:11434	
-Modelos locais de IA para NLP
+Ollama (LLaMA)
+- http://localhost:11434
+- Modelos locais de IA para NLP
 
-MinIO	
-http://localhost:9001	
-Armazenamento de objetos (S3)
+MinIO
+- http://localhost:9001
+- Armazenamento de objetos (S3)
 
-Grafana	
-http://localhost:3000	
-Dashboard para métricas e logs
+Grafana
+- http://localhost:3000
+- Dashboard para métricas e logs
 
-Prometheus	
-http://localhost:9090	
-Backend de monitoramento de métricas
+Prometheus
+- http://localhost:9090
+- Backend de monitoramento de métricas
 
-Traefik	
-http://localhost	
-Gateway de acesso e proxy reverso
+Traefik
+- http://localhost
+- Gateway de acesso e proxy reverso
 
 ## 🔐 Gestão de Secrets
 Secrets gerenciados via Docker Secrets (secrets.sh):
