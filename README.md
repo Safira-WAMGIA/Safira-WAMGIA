@@ -150,10 +150,56 @@ Acesse a documentação em: [http://localhost:8000](http://localhost:8000).
 
 ---
 
-## 🔄 Integração Contínua (CI/CD)
+## 🔄 Integração Contínua (CI/CD) com Git + Scripts
 
 - **GitHub Actions**: Pipelines de validação (linting, testes unitários e build de imagens Docker).
 - **Jenkins**: Pipelines avançados para integração e deployment contínuos.
+
+O projeto Safira utiliza uma estratégia de versionamento baseada em **Git Flow simplificado**, com integração contínua via **GitHub Actions** e deploy gerenciado por versões estáveis em `main`.
+
+### 🧬 Branches principais
+
+| Branch         | Função                                       |
+|----------------|----------------------------------------------|
+| `develop`      | Desenvolvimento contínuo                     |
+| `release/x.x.x`| Pré-produção (validação via CI)              |
+| `main`         | Produção (builds estáveis e versões finais)  |
+
+---
+
+### 📜 Scripts de automação
+
+Para facilitar a gestão de versões, utilizamos scripts Bash que automatizam cada etapa:
+
+| Script                | Descrição                                                              |
+|------------------------|------------------------------------------------------------------------|
+| `./push-dev.sh`        | Envia alterações locais para `develop`                                |
+| `./promote-release.sh` | Cria uma branch `release/vX.Y.Z` a partir da `develop`                |
+| `./promote-main.sh`    | Faz merge de `release/vX.Y.Z` para `main` e cria a tag `vX.Y.Z`       |
+| `./release.sh`         | (Opcional) Gera uma release no GitHub com changelog e metadados       |
+
+---
+
+### ⚙️ Ciclo completo de CI/CD
+
+```bash
+# 1. Codifique normalmente e envie para develop
+./push-dev.sh "feat: adiciona agente financeiro"
+
+# 2. Quando estiver pronto para validação:
+./promote-release.sh 1.0.0
+
+# (GitHub Actions rodará build/testes na release/v1.0.0)
+
+# 3. Após validação com sucesso:
+./promote-main.sh 1.0.0
+
+# (GitHub Actions na main irá:
+#    - Buildar e publicar a imagem
+#    - Exportar compose-resolved.yml
+#    - (Opcional) Criar release com ./release.sh
+)
+
 
 ---
 
