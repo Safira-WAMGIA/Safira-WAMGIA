@@ -1,0 +1,22 @@
+# Exemplo simples de develop-ci.yml
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Deps
+        run: |
+          pip install -U pip
+          pip install pytest ruff
+      - name: Run Ruff
+        run: ruff .
+      - name: Run Pytest
+        run: pytest -q
