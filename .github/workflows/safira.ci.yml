@@ -29,7 +29,7 @@ jobs:
           pip install pytest ruff
 
       - name: Ruff (linter/formatter)
-        run: ruff .
+        run: ruff check .
 
       - name: Pytest
         run: pytest -q
@@ -57,8 +57,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Ajuste o --file ou context se você gerar uma imagem única
-      # Para múltiplos Dockerfiles (venom, n8n, etc.) faça um loop
       - name: Build & push safira stack
         uses: docker/build-push-action@v5
         with:
@@ -69,7 +67,6 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      # Garante que o docker‑compose esteja coerente após interpolar envs
       - name: Export resolved compose (debug)
         run: docker compose config > compose-resolved.yml
 
