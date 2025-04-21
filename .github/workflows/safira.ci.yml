@@ -1,4 +1,3 @@
-# .github/workflows/safira-ci.yml
 name: Safira CI/CD
 
 on:
@@ -25,15 +24,15 @@ jobs:
       - name: Install deps
         run: |
           pip install -U pip
-          [ -f requirements.txt ] && pip install -r requirements.txt
-          pip install pytest ruff
+          [ -f requirements.txt ] && pip install -r requirements.txt || echo "requirements.txt não encontrado, prosseguindo..."
+          pip install pytest ruff coverage
 
       - name: Ruff (linter/formatter)
         run: ruff check .
 
       - name: Pytest (skip if no tests)
         run: |
-          pytest -q
+          pytest -q --cov=. --cov-report=xml
           RET=$?
           if [ $RET -eq 5 ]; then
             echo "⚠️ Nenhum teste encontrado. Pulando pytest."
@@ -41,6 +40,12 @@ jobs:
           else
             exit $RET
           fi
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
 
   build-push:
     needs: lint-test
@@ -77,9 +82,9 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Export resolved compose (debug)
-        run: docker compose config > compose-resolved.yml
+        run: docker compose config > compose-resolved-${{ github.sha }}.yml
 
       - uses: actions/upload-artifact@v3
         with:
-          name: compose-resolved
-          path: compose-resolved.yml
+          name: compose-resolved-${{ github.sha }}
+          path: compose-resolved-${{ github.sha }}.yml
