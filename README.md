@@ -182,18 +182,21 @@ Para facilitar a gestão de versões, utilizamos scripts Bash que automatizam ca
 
 ### ⚙️ Ciclo completo de CI/CD
 
-```bash
+
 # 1. Codifique normalmente e envie para develop
+```bash
 ./push-dev.sh "feat: adiciona agente financeiro"
-
+```
 # 2. Quando estiver pronto para validação:
+```bash
 ./promote-release.sh 1.0.0
-
+```
 # (GitHub Actions rodará build/testes na release/v1.0.0)
 
 # 3. Após validação com sucesso:
+```bash
 ./promote-main.sh 1.0.0
-
+```
 # (GitHub Actions na main irá:
 #    - Buildar e publicar a imagem
 #    - Exportar compose-resolved.yml
