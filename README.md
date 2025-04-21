@@ -91,30 +91,47 @@ Utilize o run.sh para controlar a stack Safira facilmente:
 
 ## 🧩 Componentes e Endpoints
 
-Serviço	Endpoint padrão	Descrição
-N8N Core (Safira)	http://localhost:5678	Workflow automation principal
-Admin (N8N)	http://localhost:5680	Administração separada de workflows
-Venom API	http://localhost:3001	API de integração com WhatsApp
-Ollama (LLaMA)	http://localhost:11434	Modelos locais de IA para NLP
-MinIO	http://localhost:9001	Armazenamento de objetos (S3)
-Grafana	http://localhost:3000	Dashboard para métricas e logs
-Prometheus	http://localhost:9090	Backend de monitoramento de métricas
-Traefik	http://localhost	Gateway de acesso e proxy reverso
+N8N Core (Safira)	
+http://localhost:5678	
+Workflow automation principal
+
+Admin (N8N)	
+http://localhost:5680	
+Administração separada de workflows
+
+Venom API	
+http://localhost:3001	
+API de integração com WhatsApp
+
+Ollama (LLaMA)	
+http://localhost:11434	
+Modelos locais de IA para NLP
+
+MinIO	
+http://localhost:9001	
+Armazenamento de objetos (S3)
+
+Grafana	
+http://localhost:3000	
+Dashboard para métricas e logs
+
+Prometheus	
+http://localhost:9090	
+Backend de monitoramento de métricas
+
+Traefik	
+http://localhost	
+Gateway de acesso e proxy reverso
 
 ## 🔐 Gestão de Secrets
 Secrets gerenciados via Docker Secrets (secrets.sh):
 
-Senhas PostgreSQL (Safira, Pagamento, Jira)
-
-MinIO Root Password
-
-Grafana Admin Password
-
-JWT e Secrets do Supabase
-
-Redis Password
-
-Jenkins Admin Password
++ Senhas PostgreSQL (Safira, Pagamento, Jira)
++ MinIO Root Password
++ Grafana Admin Password
++ JWT e Secrets do Supabase
++ Redis Password
++ Jenkins Admin Password
 
 Gerar/atualizar secrets:
 ```bash
@@ -131,59 +148,52 @@ Acesse a documentação em: http://localhost:8000.
 
 
 ## 🔄 CI/CD e DevOps
-GitHub Actions: Validação automática com lint, testes unitários e build de imagens Docker.
-
-Jenkins: Pipelines avançados e gestão contínua de integração e deployment.
-
-Watchtower: Atualizações automáticas de containers.
++ GitHub Actions: Validação automática com lint, testes unitários e build de imagens Docker.
++ Jenkins: Pipelines avançados e gestão contínua de integração e deployment.
++ Watchtower: Atualizações automáticas de containers.
 
 ## 📊 Observabilidade e Logs
-Métricas com Prometheus/Grafana
-
-Logs centralizados em Loki com visualização em Grafana.
++ Métricas com Prometheus/Grafana
++ Logs centralizados em Loki com visualização em Grafana.
 
 ## 📦 Implantação e Escalabilidade
-Deployment recomendado em ambiente Docker Swarm ou Kubernetes.
-
-Escalonamento horizontal possível via replicação de containers.
++ Deployment recomendado em ambiente Docker Swarm ou Kubernetes.
++ Escalonamento horizontal possível via replicação de containers.
 
 ## 💡 Boas Práticas Adotadas
-Princípios SOLID aplicados na organização dos microsserviços.
-
-DRY com uso de anchors YAML.
-
-Secrets isolados e seguros.
-
-Scripts idempotentes e automatizados para setup e manutenção.
-
-Healthchecks integrados garantindo disponibilidade.
++ Princípios SOLID aplicados na organização dos microsserviços.
++ DRY com uso de anchors YAML.
++ Secrets isolados e seguros.
++ Scripts idempotentes e automatizados para setup e manutenção.
++ Healthchecks integrados garantindo disponibilidade.
 
 ## 🤝 Contribuição e Issues
 Para contribuir:
 
-Fork o projeto.
++ Fork o projeto.
 
-Crie um branch para sua feature (git checkout -b feature/nova-funcionalidade).
++ Crie um branch para sua feature
+```bash
+git checkout -b feature/nova-funcionalidade
+```
 
-Realize commits claros (git commit -m 'Descrição concisa').
++ Realize commits claros
+```bash
+git commit -m 'Descrição concisa'
+```
 
-Abra um pull request detalhado para revisão.
-
-Para reportar issues, utilize o sistema de Issues do GitHub, descrevendo detalhadamente o problema ou sugestão.
++ Abra um pull request detalhado para revisão.
++ Para reportar issues, utilize o sistema de Issues do GitHub, descrevendo detalhadamente o problema ou sugestão.
 
 ## 📜 Licença
-Este projeto é licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+Este projeto é Particular.
 
 ## 🚩 Próximos Passos (Roadmap)
- Integração completa com gateways de pagamento
-
- Melhoria na arquitetura de filas e workers
-
- Implementação de caching inteligente
-
- Suporte multi-idioma completo (PT, EN, ES)
-
- Expansão para serviços cloud (AWS/GCP/Azure)
+- [ ] Integração completa com gateways de pagamento
+- [ ] Melhoria na arquitetura de filas e workers
+- [ ] Implementação de caching inteligente
+- [ ] Suporte multi-idioma completo (PT, EN, ES)
+- [ ] Expansão para serviços cloud (AWS/GCP/Azure)
 
 ✨ Happy coding!
 Equipe Safira WAMGIA 🔮🚀
