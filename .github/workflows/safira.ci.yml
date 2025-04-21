@@ -1,0 +1,79 @@
+# .github/workflows/safira-ci.yml
+name: Safira CI/CD
+
+on:
+  push:
+    branches: [main, master]     # muda se o default branch for outro
+  pull_request:
+    branches: [main, master]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}   # ex.: ghcr.io/caioross/safira-wamgia
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install -U pip
+          [ -f requirements.txt ] && pip install -r requirements.txt
+          pip install pytest ruff
+
+      - name: Ruff (linter/formatter)
+        run: ruff .
+
+      - name: Pytest
+        run: pytest -q
+
+  build-push:
+    needs: lint-test               # só compila se testes passarem
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write              # necessário p/ ghcr login com GITHUB_TOKEN
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (cross‑compile)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Ajuste o --file ou context se você gerar uma imagem única
+      # Para múltiplos Dockerfiles (venom, n8n, etc.) faça um loop
+      - name: Build & push safira stack
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      # Garante que o docker‑compose esteja coerente após interpolar envs
+      - name: Export resolved compose (debug)
+        run: docker compose config > compose-resolved.yml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: compose-resolved
+          path: compose-resolved.yml
