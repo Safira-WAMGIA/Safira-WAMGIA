@@ -68,23 +68,23 @@ chmod +x setup.sh run.sh secrets.sh
 ## 🐳 Executando a Aplicação
 Utilize o run.sh para controlar a stack Safira facilmente:
 
-# Subir todos os serviços
+### Subir todos os serviços
 ```bash
 ./run.sh up
 ```
-# Parar todos os serviços
+### Parar todos os serviços
 ```bash
 ./run.sh down
 ```
-# Reiniciar a stack completa
+### Reiniciar a stack completa
 ```bash
 ./run.sh restart
 ```
-# Consultar o status atual da stack
+### Consultar o status atual da stack
 ```bash
 ./run.sh status
 ```
-# Visualizar logs de um serviço específico
+### Visualizar logs de um serviço específico
 ```bash
 ./run.sh logs <nome-serviço> --save
 ```
