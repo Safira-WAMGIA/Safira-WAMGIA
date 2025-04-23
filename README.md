@@ -218,5 +218,8 @@ Este projeto é **Particular** e não está disponível para uso público sem au
 
 ---
 
+## 🚨 Discord:
+https://discord.gg/rwVdW52nz7
+
 ✨ **Happy coding!**  
 Equipe Safira WAMGIA 🔮🚀
