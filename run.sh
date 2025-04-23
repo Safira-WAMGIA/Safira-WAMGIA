@@ -104,3 +104,5 @@ case $action in
   completion) completion_script ;;
   help) echo "Ver README" ;;
 esac
+
+read -n 1 -s -r -p "🚀 Pressione qualquer tecla para sair..."

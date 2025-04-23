@@ -10,13 +10,26 @@
 #  • Pull & valida docker‑compose                                              #
 ###############################################################################
 set -Eeuo pipefail
-trap 'echo -e "\n❌ Algo deu errado. Verifique os logs acima."; exit 1' ERR
+trap 'echo -e "\n❌ Algo deu errado durante a execução."; \
+echo "Comando com erro: $BASH_COMMAND"; \
+echo "\nPressione Enter para sair..."; \
+read; \
+exit 1' ERR
 
 banner(){ echo -e "\n\033[1;36m$1\033[0m"; }
 
 # ───── CLI flags ──────────────────────────────────────────────────────────
 DEV=false  # ignora Swarm / secrets
 while [[ $# -gt 0 ]]; do case $1 in --dev) DEV=true ;; *) ;; esac; shift; done
+
+# ───── Swarm automático ───────────────────────────────────────────────────
+if ! $DEV; then
+  SWARM_STATE=$(docker info --format '{{.Swarm.LocalNodeState}}')
+  if [[ $SWARM_STATE != active ]]; then
+    banner "⚙️  Swarm não iniciado – ativando automaticamente"
+    docker swarm init >/dev/null && echo "✓ Swarm iniciado"
+  fi
+fi
 
 # ───── Dependências ───────────────────────────────────────────────────────
 banner "🔍  Dependências"
@@ -43,7 +56,7 @@ create_if_absent docs/docs/index.md '# Bem‑vindo à documentação da Safira'
 
 # ───── Scaffold serviços Python ─────────────────────────────────────────--
 banner "🐍  Scaffold Docker/Python"
-read -r -d '' DOCKERFILE_TPL <<'DOCKER'
+DOCKERFILE_TPL=$(cat <<'DOCKER'
 FROM python:3.12-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential gcc ffmpeg libsndfile1 git curl && rm -rf /var/lib/apt/lists/*
@@ -59,23 +72,26 @@ HEALTHCHECK CMD curl -f http://localhost:${HEALTH_PORT:-8000}/healthz || exit 1
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 DOCKER
+)
 
-read -r -d '' REQS_TPL <<'REQ'
+REQS_TPL=$(cat <<'REQ'
 fastapi>=0.110,<0.111
 uvicorn[standard]>=0.29,<0.30
 python-dotenv
 pydantic
 requests
 REQ
+)
 
-read -r -d '' ENTRYPOINT_TPL <<'ENT'
+ENTRYPOINT_TPL=$(cat <<'ENT'
 #!/usr/bin/env bash
 set -e
 [[ -f /app/bootstrap.sh ]] && bash /app/bootstrap.sh
 exec "$@"
 ENT
+)
 
-read -r -d '' MAIN_TPL <<'PY'
+MAIN_TPL=$(cat <<'PY'
 from fastapi import FastAPI
 app = FastAPI()
 @app.get('/healthz', include_in_schema=False)
@@ -85,6 +101,7 @@ def healthz():
 def root():
     return {'msg': '🚀 Safira service booting!'}
 PY
+)
 
 for svc in venom csm voice/input image/input image/output ai-functions backup; do
   [[ -f $svc/Dockerfile ]]      || { printf '%s\n' "$DOCKERFILE_TPL"  > "$svc/Dockerfile"; echo "• Dockerfile → $svc/"; }
@@ -138,12 +155,22 @@ else
   banner "🔓  --dev flag ativa – ignorando secrets"
 fi
 
-# ───── Pull & validação ─────────────────────────────────────────────────--
-banner "🐳  Pull de imagens"
-$DOCKER_COMPOSE pull --quiet
 
-banner "🧪  Validando compose"
-$DOCKER_COMPOSE --env-file .env config >/dev/null
+# ───── Pull & validação (modo Swarm ou compose) ──────────────────────────
+banner "🐳  Validando stack"
+if $DEV; then
+  $DOCKER_COMPOSE pull --quiet
+  $DOCKER_COMPOSE --env-file .env config >/dev/null
+else
+  docker stack deploy --compose-file docker-compose.yml safira --prune
+  docker stack services safira
+fi
+
 
 banner "🎉  Setup concluído"
 echo "Execute:  $DOCKER_COMPOSE up -d (ou ./run.sh up)"
+
+# ───── Espera por tecla antes de fechar ──────────────────────────────────
+echo "\n🚀 Pressione Enter para sair..."
+read
+

@@ -1,0 +1,1 @@
+entryPoints:\n  web: { address: ":80" }\n  websecure: { address: ":443" }\napi: { dashboard: true }\nproviders:\n  docker: { exposedByDefault: false }\nlog: { level: ${TRAEFIK_LOG_LEVEL:-INFO} }

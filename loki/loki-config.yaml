@@ -1,0 +1,1 @@
+auth_enabled: false\nserver:\n  http_listen_port: 3100

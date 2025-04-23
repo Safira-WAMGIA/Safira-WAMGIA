@@ -37,8 +37,8 @@ services:
     image: minio/minio
     command: server /data --console-address ":9001"
     ports:
-      - "${PORT_MINIO_API:-9000}:9000"      # API S3
-      - "${PORT_MINIO_CONSOLE:-9001}:9001"  # UI
+      - "${PORT_MINIO_API:-9000}:9000"
+      - "${PORT_MINIO_CONSOLE:-9001}:9001"
     volumes: [minio-data:/data]
     <<: [*common-env, *health-http, *default-log]
     environment:
@@ -93,11 +93,15 @@ services:
 
   grafana:
     image: grafana/grafana
-    ports: ["${PORT_GRAFANA:-3000}:3000"]
-    volumes: [grafana-data:/var/lib/grafana]
-    environment: [GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_pwd]
+    ports:
+      - "${PORT_GRAFANA:-3000}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_pwd
+    secrets:
+      - grafana_pwd
     <<: [*common-env, *default-log]
-    secrets: [grafana_pwd]
 
   loki:
     image: grafana/loki
@@ -129,7 +133,7 @@ services:
     labels: ["com.centurylinklabs.watchtower.enable=true"]
     <<: [*common-env, *default-log]
     depends_on:
-      db-safira: {condition: service_healthy}
+      - db-safira
 
   administrador:
     image: n8nio/n8n
@@ -137,7 +141,7 @@ services:
     volumes: [admin-data:/home/node/.n8n]
     <<: [*common-env, *default-log]
     depends_on:
-      db-safira: {condition: service_healthy}
+      - db-safira
 
   # ───── IA & Serviços custom ─────
   llama:
@@ -195,7 +199,6 @@ services:
 
   spark:
     image: bitnami/spark:latest
-    profiles: ["analytics"]
     environment: [SPARK_MODE=master]
     ports:
       - "${PORT_SPARK_MASTER:-7077}:7077"
@@ -208,4 +211,43 @@ services:
     image: atlassian/jira-software
     ports: ["${PORT_JIRA:-8090}:8080"]
     volumes: [jira-data:/var/atlassian/application-data/jira]
-    <<: [*common-env, *default
+    <<: [*common-env, *default-log]
+
+volumes:
+  minio-data:
+  pg-safira:
+  pg-pagamento:
+  pg-jira:
+  redis-data:
+  prometheus-conf:
+  grafana-data:
+  loki-conf:
+  safira-data:
+  admin-data:
+  llama-data:
+  venom-models:
+  jenkins-data:
+  spark-data:
+  jira-data:
+
+networks:
+  safira-net:
+    driver: overlay
+    
+secrets:
+  pg_safira_pwd:
+    external: true
+  pg_pagamento_pwd:
+    external: true
+  pg_jira_pwd:
+    external: true
+  minio_pwd:
+    external: true
+  grafana_pwd:
+    external: true
+  traefik_pwd:
+    external: true
+  redis_pwd:
+    external: true
+  jenkins_admin_pwd:
+    external: true
