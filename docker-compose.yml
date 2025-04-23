@@ -154,7 +154,7 @@ services:
     build:
       context: ./csm
       args:
-        HF_TOKEN: ${HF_TOKEN}   # ← passa para o Dockerfile
+        HF_TOKEN: ${HF_TOKEN} 
         TTS_ENGINE: csm
     image: safira/csm:local
     pull_policy: never
@@ -163,11 +163,13 @@ services:
 
 
   stt:
-    image: ghcr.io/safira-wamgia/stt:latest   
-    build: ./voice/input                     
+    build:
+      context: ./voice/input
+    image: safira/stt:cpu
+    pull_policy: never
     ports: ["${PORT_STT:-9100}:9000"]
-    volumes: [./voice/input:/app]           
     <<: [*common-env, *health-http, *default-log]
+
 
 
   waha:
