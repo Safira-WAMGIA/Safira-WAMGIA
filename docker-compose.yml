@@ -162,26 +162,34 @@ services:
     volumes: [./voice/input:/app]
     <<: [*common-env, *health-http, *default-log]
 
-  venom:
-    build: ./venom
-    ports: ["${PORT_VENOM:-3001}:3001"]
-    volumes: [./venom:/app, venom-models:/models]
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha
+    ports: ["${PORT_WAHA:-3001}:3000"]
+    volumes: [./waha-sessions:/sessions]
+    environment:
+      - WHATSAPP_HOOK_URL=http://safira:5678/webhook/whats
+      - WHATSAPP_HOOK_EVENTS=*
+      - WHATSAPP_START_SESSION=default
     <<: [*common-env, *health-http, *default-log]
 
   image-reader:
-    build: ./image/input
+    image: safira/image-reader:latest     # ← imagem que você acabou de buildar ou que virá do CI
+    build: ./image/input                  # mantido p/ 'docker compose'
     ports: ["${PORT_IMG_READER:-6001}:8000"]
-    volumes: [./image/input:/app]
+    volumes: [./image/input:/app]         # hot-reload opcional
+    deploy:                               # habilitar GPU no Swarm (se houver)
+      resources:
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
     <<: [*common-env, *health-http, *default-log]
 
-  image-generator:
-    build: ./image/output
-    ports: ["${PORT_IMG_GEN:-6002}:8000"]
-    volumes: [./image/output:/app]
-    <<: [*common-env, *health-http, *default-log]
+
 
   ai-functions:
-    build: ./ai-functions
+    image: ghcr.io/seu-usuário/ai-functions:latest   # OU safira/ai-functions:latest
+    build: ./ai-functions   # mantém para quem rodar docker compose
     ports: ["${PORT_AI_FUN:-8800}:8800"]
     volumes: [./ai-functions:/app]
     <<: [*common-env, *health-http, *default-log]
@@ -225,7 +233,7 @@ volumes:
   safira-data:
   admin-data:
   llama-data:
-  venom-models:
+  waha-sessions:
   jenkins-data:
   spark-data:
   jira-data:
