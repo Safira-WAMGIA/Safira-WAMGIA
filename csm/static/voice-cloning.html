@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Voice Cloning</title>
+    <style>
+        :root {
+            /* Base colors */
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --card-shadow: rgba(0,0,0,0.1);
+            
+            /* Primary colors */
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            
+            /* Secondary colors */
+            --secondary-color: #6b7280;
+            --secondary-hover: #4b5563;
+            
+            /* Accent colors */
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --warning-color: #f59e0b;
+            --warning-hover: #d97706;
+            
+            /* Input elements */
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --input-focus-border: #4f46e5;
+            --input-focus-shadow: rgba(79, 70, 229, 0.2);
+            
+            /* Voice cards */
+            --voice-card-bg: #f9fafb;
+            --voice-card-border: #e5e7eb;
+            --voice-card-shadow: rgba(0,0,0,0.05);
+            
+            /* Tabs */
+            --tab-border: #e5e7eb;
+            --tab-text: #4b5563;
+            --tab-active: #4f46e5;
+            --tab-active-bg: rgba(79, 70, 229, 0.1);
+            
+            /* Toggle */
+            --toggle-bg: #e5e7eb;
+            --toggle-active: #4f46e5;
+            --toggle-circle: #ffffff;
+            
+            /* Status indicators */
+            --status-success-bg: #dcfce7;
+            --status-success-text: #166534;
+            --status-error-bg: #fee2e2;
+            --status-error-text: #b91c1c;
+            --status-warning-bg: #fff7ed;
+            --status-warning-text: #c2410c;
+            --status-info-bg: #eff6ff;
+            --status-info-text: #1e40af;
+        }
+        
+        [data-theme="dark"] {
+            /* Base colors */
+            --bg-color: #111827;
+            --text-color: #f3f4f6;
+            --card-bg: #1f2937;
+            --card-border: #374151;
+            --card-shadow: rgba(0,0,0,0.3);
+            
+            /* Primary colors */
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.2);
+            
+            /* Secondary colors */
+            --secondary-color: #9ca3af;
+            --secondary-hover: #6b7280;
+            
+            /* Accent colors - slightly brighter for dark theme */
+            --success-color: #34d399;
+            --success-hover: #10b981;
+            --danger-color: #f87171;
+            --danger-hover: #ef4444;
+            --warning-color: #fbbf24;
+            --warning-hover: #f59e0b;
+            
+            /* Input elements */
+            --input-bg: #374151;
+            --input-border: #4b5563;
+            --input-focus-border: #6366f1;
+            --input-focus-shadow: rgba(99, 102, 241, 0.3);
+            
+            /* Voice cards */
+            --voice-card-bg: #1f2937;
+            --voice-card-border: #374151;
+            --voice-card-shadow: rgba(0,0,0,0.2);
+            
+            /* Tabs */
+            --tab-border: #374151;
+            --tab-text: #9ca3af;
+            --tab-active: #6366f1;
+            --tab-active-bg: rgba(99, 102, 241, 0.2);
+            
+            /* Toggle */
+            --toggle-bg: #4b5563;
+            --toggle-active: #6366f1;
+            --toggle-circle: #e5e7eb;
+            
+            /* Status indicators */
+            --status-success-bg: rgba(16, 185, 129, 0.2);
+            --status-success-text: #34d399;
+            --status-error-bg: rgba(239, 68, 68, 0.2);
+            --status-error-text: #f87171;
+            --status-warning-bg: rgba(245, 158, 11, 0.2);
+            --status-warning-text: #fbbf24;
+            --status-info-bg: rgba(59, 130, 246, 0.2);
+            --status-info-text: #60a5fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 100%;
+            padding: 16px;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 8px;
+        }
+        
+        h1, h2, h3 {
+            color: var(--text-color);
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px var(--card-shadow);
+            background-color: var(--card-bg);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 6px 12px var(--card-shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px var(--input-focus-shadow);
+        }
+        
+        /* File input styling */
+        input[type="file"] {
+            padding: 8px;
+            background-color: var(--input-bg);
+            border: 1px dashed var(--input-border);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        input[type="file"]:hover {
+            border-color: var(--primary-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.1s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-row button {
+            flex: 1;
+        }
+        
+        .voice-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .voice-card {
+            border: 1px solid var(--voice-card-border);
+            border-radius: 10px;
+            padding: 16px;
+            background-color: var(--voice-card-bg);
+            box-shadow: 0 2px 6px var(--voice-card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .voice-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px var(--voice-card-shadow);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .voice-name {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 0 0 8px 0;
+            color: var(--primary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+        
+        #audio-preview {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 8px;
+            background-color: var(--card-bg);
+        }
+        
+        /* Status indicators */
+        .status-indicator {
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .status-indicator.show {
+            opacity: 1;
+            max-height: 100px;
+        }
+        
+        .status-indicator.success {
+            background-color: var(--status-success-bg);
+            color: var(--status-success-text);
+        }
+        
+        .status-indicator.error {
+            background-color: var(--status-error-bg);
+            color: var(--status-error-text);
+        }
+        
+        .status-indicator.warning {
+            background-color: var(--status-warning-bg);
+            color: var(--status-warning-text);
+        }
+        
+        .status-indicator.info {
+            background-color: var(--status-info-bg);
+            color: var(--status-info-text);
+        }
+        
+        .status-indicator svg {
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--tab-border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome/Safari */
+        }
+        
+        .tabs button {
+            background-color: transparent;
+            color: var(--tab-text);
+            border: none;
+            padding: 12px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+            position: relative;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            white-space: nowrap;
+            width: auto;
+            flex-shrink: 0;
+        }
+        
+        .tabs button.active {
+            color: var(--tab-active);
+            background-color: var(--tab-active-bg);
+        }
+        
+        .tabs button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--tab-active);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Theme toggle switch */
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        
+        .theme-switch {
+            display: inline-block;
+            height: 28px;
+            position: relative;
+            width: 54px;
+        }
+        
+        .theme-switch input {
+            display: none;
+        }
+        
+        .slider {
+            background-color: var(--toggle-bg);
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 28px;
+        }
+        
+        .slider:before {
+            background-color: var(--toggle-circle);
+            bottom: 4px;
+            content: "";
+            height: 20px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 20px;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        input:checked + .slider {
+            background-color: var(--toggle-active);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .theme-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            margin: 0 8px;
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: var(--input-bg);
+            border-radius: 6px;
+            margin-top: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px var(--card-shadow);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--primary-hover));
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+            border-radius: 6px;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%
+            );
+            background-size: 16px 16px;
+            animation: progress-animation 1s linear infinite;
+            border-radius: 6px;
+        }
+        
+        @keyframes progress-animation {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 16px 0;
+            }
+        }
+        
+        /* Divider */
+        .divider {
+            margin: 24px 0;
+            border-top: 1px solid var(--card-border);
+            position: relative;
+        }
+        
+        .divider-text {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-color);
+            padding: 0 12px;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+        
+        /* Small text */
+        small {
+            color: var(--secondary-color);
+            display: block;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+        
+        /* Range slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--input-bg);
+            outline: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="range"]::-ms-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        #temperature-value {
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 100%;
+            width: 300px;
+        }
+        
+        .toast {
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: toast-in 0.3s ease forwards;
+            max-width: 100%;
+        }
+        
+        .toast.success {
+            background-color: var(--success-color);
+        }
+        
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+        
+        .toast.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .toast.info {
+            background-color: var(--primary-color);
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.8;
+            width: auto;
+            padding: 0 0 0 12px;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+            background: none;
+        }
+        
+        @keyframes toast-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 640px) {
+            body {
+                padding: 12px 8px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .voice-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .controls button {
+                width: 100%;
+            }
+            
+            .tabs button {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+        }
+        /* Checkbox styling */
+        .checkbox-group {
+            margin-bottom: 20px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            height: 18px;
+            width: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        .checkbox-text {
+            position: relative;
+            top: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="theme-switch-wrapper">
+            <span class="theme-icon">☀️</span>
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider"></div>
+            </label>
+            <span class="theme-icon">🌙</span>
+        </div>
+        
+        <h1>Voice Cloning</h1>
+        
+        <div class="tabs">
+            <button id="tab-clone" class="active">Clone Voice</button>
+            <button id="tab-voices">My Voices</button>
+            <button id="tab-generate">Generate Speech</button>
+        </div>
+        
+        <!-- Status indicator -->
+        <div id="status-message" class="status-indicator">
+            <!-- Content will be dynamically inserted -->
+        </div>
+        
+        <div id="clone-tab" class="tab-content active">
+            <div class="card">
+                <h2>Clone a New Voice</h2>
+                <form id="clone-form">
+                    <div class="form-group">
+                        <label for="voice-name">Voice Name</label>
+                        <input type="text" id="voice-name" name="name" required placeholder="e.g. My Voice">
+                    </div>
+                    <div class="form-group">
+                        <label for="audio-file">Voice Sample (2-3 minute audio recording)</label>
+                        <input type="file" id="audio-file" name="audio_file" required accept="audio/*">
+                        <small>For best results, provide a clear recording with minimal background noise.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="transcript">Transcript (Optional)</label>
+                        <textarea id="transcript" name="transcript" rows="4" placeholder="Exact transcript of your audio sample..."></textarea>
+                        <small>Adding a transcript helps improve voice accuracy.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <input type="text" id="description" name="description" placeholder="A description of this voice">
+                    </div>
+                    <button type="submit">Clone Voice</button>
+                </form>
+            </div>
+            
+            <div class="divider">
+                <span class="divider-text">OR</span>
+            </div>
+            
+            <div class="card">
+                <h2>Clone Voice from YouTube</h2>
+                <form id="youtube-clone-form">
+                    <div class="form-group">
+                        <label for="youtube-url">YouTube URL</label>
+                        <input type="url" id="youtube-url" name="youtube_url" required placeholder="https://www.youtube.com/watch?v=...">
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube-voice-name">Voice Name</label>
+                        <input type="text" id="youtube-voice-name" name="voice_name" required placeholder="e.g. YouTube Voice">
+                    </div>
+                    <div class="form-group">
+                        <label for="start-time">Start Time (seconds)</label>
+                        <input type="number" id="start-time" name="start_time" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (seconds)</label>
+                        <input type="number" id="duration" name="duration" min="10" max="600" value="180">
+                        <small>Recommended: 2-3 minutes of clear speech</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="youtube-description">Description (Optional)</label>
+                        <input type="text" id="youtube-description" name="description" placeholder="A description of this voice">
+                    </div>
+                    <button type="submit">Clone from YouTube</button>
+                </form>
+                <div id="youtube-progress" style="display: none; margin-top: 16px;">
+                    <p>Processing YouTube video... <span id="progress-status">Downloading</span></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="voices-tab" class="tab-content">
+            <h2>My Cloned Voices</h2>
+            <div id="voice-list" class="voice-list">
+                <!-- Voice cards will be added here -->
+            </div>
+        </div>
+        
+        <div id="generate-tab" class="tab-content">
+            <div class="card">
+                <h2>Generate Speech with Cloned Voice</h2>
+                <form id="generate-form">
+                    <div class="form-group">
+                        <label for="voice-select">Select Voice</label>
+                        <select id="voice-select" name="voice" required>
+                            <option value="">Select a voice</option>
+                            <!-- Voice options will be added here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="generate-text">Text to Speak</label>
+                        <textarea id="generate-text" name="text" rows="4" required placeholder="Enter text to synthesize with the selected voice..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Temperature: <span id="temperature-value">0.7</span></label>
+                        <input type="range" id="temperature" name="temperature" min="0.5" max="1.0" step="0.05" value="0.7">
+                        <small>Lower values (0.5-0.7) produce more consistent speech, higher values (0.8-1.0) produce more varied speech.</small>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="use-streaming" name="use_streaming">
+                            <span class="checkbox-text">Use streaming mode</span>
+                        </label>
+                        <small>Stream audio as it's generated for faster start and lower latency.</small>
+                    </div>
+                    <button type="submit">Generate Speech</button>
+                </form>
+                <audio id="audio-preview" controls style="display: none;"></audio>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast notifications container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <script>
+        // Theme toggle functionality
+        const toggleSwitch = document.querySelector('#checkbox');
+        const html = document.querySelector('html');
+        
+        // Check for saved theme preference or use system preference
+        function getThemePreference() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+            // Check if system prefers dark mode
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        // Apply the theme
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            toggleSwitch.checked = theme === 'dark';
+        }
+        
+        // Initialize theme
+        setTheme(getThemePreference());
+        
+        // Listen for toggle changes
+        toggleSwitch.addEventListener('change', function(e) {
+            if (e.target.checked) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        });
+        
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button class="toast-close">&times;</button>
+            `;
+            container.appendChild(toast);
+            
+            // Auto remove after duration
+            const timeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            }, duration);
+            
+            // Manual close
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                clearTimeout(timeout);
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    container.removeChild(toast);
+                }, 300);
+            });
+        }
+        
+        // Status indicator functions
+        function showStatus(message, type) {
+            const statusElem = document.getElementById('status-message');
+            statusElem.className = `status-indicator ${type} show`;
+            
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    break;
+                case 'error':
+                    icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    break;
+                case 'warning':
+                    icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    break;
+                case 'info':
+                    icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                    break;
+            }
+            
+            statusElem.innerHTML = icon + message;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusElem.className = 'status-indicator';
+            }, 5000);
+        }
+        
+        function hideStatus() {
+            const statusElem = document.getElementById('status-message');
+            statusElem.className = 'status-indicator';
+        }
+        
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tabs button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding tab content
+                const tabId = tab.id.replace('tab-', '');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Hide any status messages when changing tabs
+                hideStatus();
+            });
+        });
+        
+        // Temperature slider
+        const temperatureSlider = document.getElementById('temperature');
+        const temperatureValue = document.getElementById('temperature-value');
+        
+        temperatureSlider.addEventListener('input', () => {
+            temperatureValue.textContent = temperatureSlider.value;
+        });
+        
+        // Load voices
+        async function loadVoices() {
+            try {
+                const response = await fetch('/v1/voice-cloning/voices');
+                const data = await response.json();
+                const voiceList = document.getElementById('voice-list');
+                const voiceSelect = document.getElementById('voice-select');
+                
+                // Clear existing content
+                voiceList.innerHTML = '';
+                
+                // Clear voice select options but keep the first one
+                while (voiceSelect.options.length > 1) {
+                    voiceSelect.remove(1);
+                }
+                
+                if (data.voices && data.voices.length > 0) {
+                    data.voices.forEach(voice => {
+                        // Add to voice list
+                        const voiceCard = document.createElement('div');
+                        voiceCard.className = 'voice-card';
+                        voiceCard.innerHTML = `
+                            <h3 class="voice-name">${voice.name}</h3>
+                            <p>${voice.description || 'No description'}</p>
+                            <p>Created: ${new Date(voice.created_at * 1000).toLocaleString()}</p>
+                            <div class="controls">
+                                <button class="btn-secondary preview-voice" data-id="${voice.id}">Preview</button>
+                                <button class="btn-danger delete-voice" data-id="${voice.id}">Delete</button>
+                            </div>
+                        `;
+                        voiceList.appendChild(voiceCard);
+                        
+                        // Add to voice select
+                        const option = document.createElement('option');
+                        option.value = voice.id;
+                        option.textContent = voice.name;
+                        voiceSelect.appendChild(option);
+                    });
+                    
+                    // Add event listeners for preview and delete buttons
+                    document.querySelectorAll('.preview-voice').forEach(button => {
+                        button.addEventListener('click', previewVoice);
+                    });
+                    document.querySelectorAll('.delete-voice').forEach(button => {
+                        button.addEventListener('click', deleteVoice);
+                    });
+                    
+                    showStatus(`Loaded ${data.voices.length} voices successfully`, 'success');
+                } else {
+                    voiceList.innerHTML = '<p>No cloned voices yet. Create one in the "Clone Voice" tab.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading voices:', error);
+                showStatus('Failed to load voices', 'error');
+            }
+        }
+        
+        // Preview voice
+        async function previewVoice(event) {
+            const button = event.target;
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner"></div> Loading...';
+            
+            const voiceId = button.dataset.id;
+            const audioPreview = document.getElementById('audio-preview');
+            
+            try {
+                const response = await fetch(`/v1/voice-cloning/voices/${voiceId}/preview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: "This is a preview of my cloned voice. I hope you like how it sounds!"
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    audioPreview.src = url;
+                    audioPreview.style.display = 'block';
+                    
+                    // Switch to the generate tab
+                    document.getElementById('tab-generate').click();
+                    
+                    // Set the voice in the select
+                    document.getElementById('voice-select').value = voiceId;
+                    audioPreview.play();
+                    
+                    showToast('Voice preview loaded', 'success');
+                } else {
+                    showToast('Failed to preview voice', 'error');
+                }
+            } catch (error) {
+                console.error('Error previewing voice:', error);
+                showToast('Error previewing voice', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
+        // Delete voice
+        async function deleteVoice(event) {
+            if (!confirm('Are you sure you want to delete this voice? This cannot be undone.')) {
+                return;
+            }
+            
+            const button = event.target;
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner"></div> Deleting...';
+            
+            const voiceId = button.dataset.id;
+            
+            try {
+                const response = await fetch(`/v1/voice-cloning/voices/${voiceId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showToast('Voice deleted successfully', 'success');
+                    loadVoices();
+                } else {
+                    showToast('Failed to delete voice', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting voice:', error);
+                showToast('Error deleting voice', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
+        // Clone voice form submission
+        document.getElementById('clone-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="spinner"></div> Cloning Voice...';
+            showStatus('Processing your audio sample...', 'info');
+            
+            try {
+                const response = await fetch('/v1/voice-cloning/clone', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus('Voice cloned successfully!', 'success');
+                    showToast('Voice cloned successfully!', 'success');
+                    event.target.reset();
+                    
+                    // Switch to the voices tab
+                    document.getElementById('tab-voices').click();
+                    loadVoices();
+                } else {
+                    const error = await response.json();
+                    showStatus(`Failed to clone voice: ${error.detail}`, 'error');
+                    showToast('Failed to clone voice', 'error');
+                }
+            } catch (error) {
+                console.error('Error cloning voice:', error);
+                showStatus('Error processing your request', 'error');
+                showToast('Error cloning voice', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+        
+        // YouTube voice cloning form submission
+        document.getElementById('youtube-clone-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const youtubeUrl = formData.get('youtube_url');
+            const voiceName = formData.get('voice_name');
+            const startTime = parseInt(formData.get('start_time'));
+            const duration = parseInt(formData.get('duration'));
+            const description = formData.get('description');
+            const progressDiv = document.getElementById('youtube-progress');
+            const progressStatus = document.getElementById('progress-status');
+            const progressFill = document.querySelector('.progress-fill');
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="spinner"></div> Processing...';
+            showStatus('Starting YouTube download...', 'info');
+            
+            // Show progress bar
+            progressDiv.style.display = 'block';
+            progressFill.style.width = '10%';
+            progressStatus.textContent = 'Downloading audio...';
+            
+            // Simulate progress updates (since we can't get real-time updates easily)
+            let progress = 10;
+            const progressInterval = setInterval(() => {
+                if (progress < 90) {
+                    progress += 5;
+                    progressFill.style.width = `${progress}%`;
+                    if (progress > 30 && progress < 60) {
+                        progressStatus.textContent = 'Generating transcript...';
+                    } else if (progress >= 60) {
+                        progressStatus.textContent = 'Cloning voice...';
+                    }
+                }
+            }, 1000);
+            
+            try {
+                const response = await fetch('/v1/voice-cloning/clone-from-youtube', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        youtube_url: youtubeUrl,
+                        voice_name: voiceName,
+                        start_time: startTime,
+                        duration: duration,
+                        description: description
+                    })
+                });
+                
+                clearInterval(progressInterval);
+                
+                if (response.ok) {
+                    progressFill.style.width = '100%';
+                    progressStatus.textContent = 'Complete!';
+                    
+                    const result = await response.json();
+                    showStatus('Voice cloned successfully from YouTube!', 'success');
+                    showToast('Voice cloned from YouTube!', 'success');
+                    
+                    event.target.reset();
+                    
+                    // Switch to the voices tab
+                    document.getElementById('tab-voices').click();
+                    loadVoices();
+                } else {
+                    const error = await response.json();
+                    showStatus(`Failed to clone voice from YouTube: ${error.detail}`, 'error');
+                    showToast('Failed to clone voice from YouTube', 'error');
+                    progressDiv.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error cloning voice from YouTube:', error);
+                showStatus('Error processing YouTube video', 'error');
+                showToast('Error cloning voice from YouTube', 'error');
+                progressDiv.style.display = 'none';
+            } finally {
+                clearInterval(progressInterval);
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+        
+        // Generate speech form submission
+        document.getElementById('generate-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const voiceId = formData.get('voice');
+            const text = formData.get('text');
+            const temperature = formData.get('temperature');
+            const useStreaming = formData.get('use_streaming') === 'on';
+            
+            if (!voiceId) {
+                showToast('Please select a voice', 'warning');
+                return;
+            }
+            
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="spinner"></div> Generating...';
+            showStatus(useStreaming ? 'Streaming speech...' : 'Generating speech...', 'info');
+            
+            try {
+                const audioPreview = document.getElementById('audio-preview');
+                
+                if (useStreaming) {
+                    // For streaming, we need to handle the response differently to play audio as it arrives
+                    try {
+                        // Reset audio element
+                        audioPreview.style.display = 'block';
+                        
+                        // Prepare the request
+                        const requestOptions = {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                model: "csm-1b",
+                                input: text,
+                                voice: voiceId,
+                                response_format: "mp3",
+                                temperature: parseFloat(temperature),
+                                speed: 1.0
+                            })
+                        };
+                        
+                        // Create a unique URL for this request to avoid caching issues
+                        const timestamp = new Date().getTime();
+                        const streamingUrl = `/v1/audio/speech/streaming?t=${timestamp}`;
+                        
+                        // Fetch from streaming endpoint
+                        const response = await fetch(streamingUrl, requestOptions);
+                        
+                        if (response.ok) {
+                            // Create a blob URL for immediate playback
+                            const blob = await response.blob();
+                            const url = URL.createObjectURL(blob);
+                            
+                            // Set the audio source and play immediately
+                            audioPreview.src = url;
+                            audioPreview.autoplay = true;
+                            
+                            // Event listeners for success/failure
+                            audioPreview.onplay = () => {
+                                showStatus('Speech streamed successfully', 'success');
+                                showToast('Speech streaming playback started', 'success');
+                            };
+                            
+                            audioPreview.onerror = (e) => {
+                                console.error('Audio playback error:', e);
+                                showStatus('Error playing streamed audio', 'error');
+                                showToast('Streaming playback error', 'error');
+                            };
+                        } else {
+                            const error = await response.json();
+                            showStatus(`Failed to stream speech: ${error.detail || 'Unknown error'}`, 'error');
+                            showToast('Failed to stream speech', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Streaming error:', error);
+                        showStatus(`Error streaming speech: ${error.message}`, 'error');
+                        showToast('Error streaming speech', 'error');
+                    }
+                } else {
+                    // Non-streaming uses the original endpoint
+                    const response = await fetch('/v1/voice-cloning/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            voice_id: voiceId,
+                            text: text,
+                            temperature: parseFloat(temperature)
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        audioPreview.src = url;
+                        audioPreview.style.display = 'block';
+                        audioPreview.play();
+                        showStatus('Speech generated successfully', 'success');
+                        showToast('Speech generated successfully', 'success');
+                    } else {
+                        const error = await response.json();
+                        showStatus(`Failed to generate speech: ${error.detail}`, 'error');
+                        showToast('Failed to generate speech', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating speech:', error);
+                showStatus('Error generating speech', 'error');
+                showToast('Error generating speech', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+
+        // Load voices on page load
+        loadVoices();
+    </script>
+</body>
+</html>

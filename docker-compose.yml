@@ -151,16 +151,24 @@ services:
     <<: [*common-env, *default-log]
 
   csm:
-    build: ./csm
-    ports: ["${PORT_CSM:-5050}:5050"]
-    volumes: [./csm:/app]
+    build:
+      context: ./csm
+      args:
+        HF_TOKEN: ${HF_TOKEN}   # ← passa para o Dockerfile
+        TTS_ENGINE: csm
+    image: safira/csm:local
+    pull_policy: never
+    ports: ["${PORT_CSM:-5050}:8000"]
     <<: [*common-env, *health-http, *default-log]
 
+
   stt:
-    build: ./voice/input
-    ports: ["${PORT_STT:-9000}:9000"]
-    volumes: [./voice/input:/app]
+    image: ghcr.io/safira-wamgia/stt:latest   
+    build: ./voice/input                     
+    ports: ["${PORT_STT:-9100}:9000"]
+    volumes: [./voice/input:/app]           
     <<: [*common-env, *health-http, *default-log]
+
 
   waha:
     image: devlikeapro/waha:latest
@@ -174,24 +182,10 @@ services:
     <<: [*common-env, *health-http, *default-log]
 
   image-reader:
-    image: safira/image-reader:latest     # ← imagem que você acabou de buildar ou que virá do CI
-    build: ./image/input                  # mantido p/ 'docker compose'
+    image: safira/image-reader:latest    
+    build: ./image/input                  
     ports: ["${PORT_IMG_READER:-6001}:8000"]
-    volumes: [./image/input:/app]         # hot-reload opcional
-    deploy:                               # habilitar GPU no Swarm (se houver)
-      resources:
-        reservations:
-          devices:
-            - capabilities: ["gpu"]
-    <<: [*common-env, *health-http, *default-log]
-
-
-
-  ai-functions:
-    image: ghcr.io/seu-usuário/ai-functions:latest   # OU safira/ai-functions:latest
-    build: ./ai-functions   # mantém para quem rodar docker compose
-    ports: ["${PORT_AI_FUN:-8800}:8800"]
-    volumes: [./ai-functions:/app]
+    volumes: [./image/input:/app]         
     <<: [*common-env, *health-http, *default-log]
 
   # ───── DevOps / CI ─────

@@ -1,8 +1,3 @@
-# Version control
-.git
-.gitignore
-.github
-
 # Python
 __pycache__/
 *.py[cod]
@@ -32,42 +27,12 @@ env/
 venv/
 ENV/
 
-# Docker related
-Dockerfile*
-docker-compose*
-.docker
-.dockerignore
-
-# Documentation
-README.md
-CHANGELOG.md
-LICENSE
-docs/
-*.md
-examples/
-tests/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Logs and temp files
-logs/
-*.log
-log.txt
-tmp/
-temp/
-.temp/
-.~*
-
-# Model files - we'll download these in the container
+# Model & data files
 models/
 tokenizers/
 voice_memories/
 voice_samples/
+cloned_voices/
 *.pt
 *.pth
 *.bin
@@ -80,6 +45,24 @@ voice_samples/
 *.opus
 *.aac
 
+# Logs
+logs/
+*.log
+log.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Temp files
+tmp/
+temp/
+.temp/
+.~*
+
 # Project specific
 .cache/
 .neptune/
@@ -90,5 +73,5 @@ MANIFEST.in
 __pycache__/
 .ipynb_checkpoints/
 
-# Ignore Hugging Face credentials except specified files
+# Ignore Hugging Face credentials
 .huggingface/

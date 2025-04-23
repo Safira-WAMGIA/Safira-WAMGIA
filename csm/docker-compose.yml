@@ -1,0 +1,25 @@
+services:
+  csm-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - HF_TOKEN=${HF_TOKEN}
+        - TTS_ENGINE=${TTS_ENGINE:-csm}
+    ports:
+      - "8999:8000"
+    volumes:
+      - ./models:/app/models
+      - ./cloned_voices:/app/cloned_voices
+      - ./voice_references:/app/voice_references  
+      - ./voice_profiles:/app/voice_profiles    
+    environment:
+      - HF_TOKEN=${HF_TOKEN}  
+      - TTS_ENGINE=${TTS_ENGINE:-csm}  # Default to CSM if not specified
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

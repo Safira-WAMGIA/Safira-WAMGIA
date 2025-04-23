@@ -1,5 +1,24 @@
-fastapi>=0.110,<0.111
-uvicorn[standard]>=0.29,<0.30
-python-dotenv
-pydantic
-requests
+fastapi>=0.100.0
+uvicorn>=0.24.0
+pydantic>=2.4.0
+python-multipart>=0.0.6
+huggingface_hub>=0.20.0
+torch>=2.0.0
+torchaudio>=2.0.0
+transformers>=4.35.0
+tokenizers>=0.14.0
+sentencepiece>=0.1.99
+triton>=2.1.0; platform_system != "Windows"
+triton-windows>=2.1.0; platform_system == "Windows"
+torchao>=0.1.0
+torchtune>=0.5.0
+numpy>=1.25.0
+ffmpeg-python>=0.2.0
+moshi>=0.1.0
+soundfile>=0.12.1
+scipy>=1.10.0
+librosa>=0.10.0
+yt-dlp>=2023.3.4
+openai-whisper>=20230314
+ffmpeg-python>=0.2.0
+accelerate>=0.20.0

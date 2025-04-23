@@ -1,108 +1,138 @@
 #!/usr/bin/env bash
 ###############################################################################
-#  Safira – run.sh (v5.1)                                                      #
-#  • Corrige lista de secrets (remove Supabase, adiciona Redis)                #
-#  • Garante permissões na pasta models/venom                                  #
+# Safira – run.sh (v1-clean-dev)                                              #
+#   • Runner único p/ desenvolvimento                                          #
+#   • Fica aberto, mostra endpoints + smoke-tests                              #
 ###############################################################################
-set -Eeuo pipefail
+
+# ─── Hard-fail config ────────────────────────────────────────────────────────
+set -euo pipefail
 shopt -s inherit_errexit 2>/dev/null || true
 
-# ───── Paleta cores ───────────────────────────────────────────────────────
-case "${TERM:-}" in xterm*|screen*|vt*) BOLD="\e[1m" CYAN="\e[36m" RED="\e[31m" RESET="\e[0m";; *) BOLD="" CYAN="" RED="" RESET="";; esac
-info(){  printf "%b%s%b\n" "$CYAN" "$1" "$RESET"; }
-error(){ printf "%b%s%b\n" "$RED"  "$1" "$RESET" >&2; }
-banner(){ info "\n$1"; }
-trap 'error "\n❌ Algo deu errado."; read -n1 -s -r -p "🔁  Pressione qualquer tecla…"; exit 1' ERR
+# ─── Variáveis editáveis rápidas ─────────────────────────────────────────────
+STACK_NAME="safira"
+COMPOSE_FILE="docker-compose.yml"
+HEALTH_TIMEOUT=240        # segundos p/ esperar containers ficarem healthy
+SMOKE_TIMEOUT=4           # cada curl teste
 
-# ───── Argparse ─────────────────────────────────────────────────────────--
-action=${1:-help}; shift || true
-dev=false; nobuild=false; save_logs=false; profile=""; svc=""; prune_soft=false
-while [[ $# -gt 0 ]]; do case $1 in
-  --dev)      dev=true ;;
-  --no-build) nobuild=true ;;
-  --save)     save_logs=true ;;
-  soft)       prune_soft=true ;;
-  *) if [[ -z $profile && $action =~ ^(up|restart)$ && ! $1 =~ ^- ]]; then profile=$1
-     elif [[ -z $svc && $action == logs ]]; then svc=$1
-     else error "Argumento desconhecido: $1"; exit 1; fi ;;
-esac; shift; done
-valid_cmds="up down restart status logs prune profiles completion help"
-if ! grep -qw "$action" <<<"$valid_cmds"; then error "Uso: $0 <${valid_cmds// /|}> [options]"; exit 1; fi
+# ─── Cores ───────────────────────────────────────────────────────────────────
+if [[ -t 1 ]]; then
+  BOLD=$'\e[1m'; CYAN=$'\e[36m'; RED=$'\e[31m'; GRN=$'\e[32m'; YEL=$'\e[33m'; RESET=$'\e[0m'
+else
+  BOLD=''; CYAN=''; RED=''; GRN=''; YEL=''; RESET=''
+fi
+log()  { printf "${CYAN}[%(%T)T]${RESET} %b\n" -1 "$*"; }
+good() { printf "${GRN}✓ %s${RESET}\n" "$*"; }
+fail() { printf "${RED}✖ %s${RESET}\n" "$*" >&2; exit 1; }
 
-# ───── Pré‑requisitos ─────────────────────────────────────────────────────
-command -v docker >/dev/null 2>&1 || { error "Docker não instalado."; exit 1; }
-if ! docker info >/dev/null 2>&1; then error "Docker daemon parado."; exit 1; fi
-if command -v docker-compose >/dev/null 2>&1; then DOCKER_COMPOSE="docker-compose"
-elif docker compose version >/dev/null 2>&1;  then DOCKER_COMPOSE="docker compose"
-else error "docker compose não encontrado."; exit 1; fi
+# ─── Pausa final (sempre) ────────────────────────────────────────────────────
+pause_exit() { [[ -t 0 ]] && { printf "\n${YEL}Pressione qualquer tecla...${RESET}"; read -n1 -s; }; }
+trap pause_exit EXIT
 
-# ───── Helpers ────────────────────────────────────────────────────────────
-ENSURE_DIRS=(backup shared docs models/venom)
-ensure_dirs(){ for d in "${ENSURE_DIRS[@]}"; do [[ -d $d ]] || mkdir -p "$d"; done }
-fix_permissions(){ for d in "${ENSURE_DIRS[@]}"; do sudo chown -R "$(id -u):$(id -g)" "$d" || true; done }
-
-compose(){ $DOCKER_COMPOSE ${profile:+--profile "$profile"} "$@"; }
-validate_config(){ compose --env-file .env config >/dev/null; }
-compose_pull(){ $nobuild || compose pull --quiet; }
-compose_up(){ validate_config; compose_pull; compose up -d ${nobuild:+} ${nobuild:+}; }
-compose_down(){ compose down --remove-orphans --timeout 20; }
-compose_status(){ compose ps --format "table {{.Service}}\t{{.State}}\t{{.PublishedPorts}}"; }
+# ─── Helpers docker compose ─────────────────────────────────────────────────
+DC(){ docker compose -f "$COMPOSE_FILE" "$@"; }
+ensure_docker(){ docker info &>/dev/null || fail "Docker daemon parado ou não instalado."; }
 
 wait_healthy(){
-  banner "⏳  Aguardando serviços ficarem healthy…"
-  end=$((SECONDS+300))
+  log "⏳ Aguardando containers ficarem healthy (máx ${HEALTH_TIMEOUT}s)..."
+  local end=$((SECONDS+HEALTH_TIMEOUT))
   while true; do
-    unhealthy=$(compose ps --filter "status=running" --filter "status=starting" --format "{{.Service}} {{.Health}}" | awk '$2!="healthy"{print $1}')
-    [[ -z $unhealthy ]] && break
-    (( SECONDS > end )) && { error "Timeout aguardando: $unhealthy"; exit 1; }
+    local bad
+    bad=$(DC ps --filter "status=running" --format "{{.Service}} {{.Health}}" | awk '$2!="healthy"{print $1}')
+    [[ -z $bad ]] && { good "Todos healthy"; return; }
+    (( SECONDS > end )) && fail "Timeout aguardando: $bad"
     sleep 2
   done
-  info "✅ Todos os serviços healthy"
 }
 
-check_files(){
-  local missing=(); for f in .env prometheus/prometheus.yml traefik/traefik.yml loki/loki-config.yaml docs/docs/index.md docs/mkdocs.yml; do [[ -f $f ]]||missing+=("$f"); done
-  ((${#missing[@]})) && { error "Arquivos faltantes: ${missing[*]} (rode ./setup.sh)"; exit 1; }
-}
-check_secrets(){
-  local expected=(pg_safira_pwd pg_pagamento_pwd pg_jira_pwd minio_pwd grafana_pwd traefik_pwd redis_pwd jenkins_admin_pwd)
-  local miss=(); for s in "${expected[@]}"; do docker secret inspect "$s" >/dev/null 2>&1 || miss+=("$s"); done
-  ((${#miss[@]})) && { error "Secrets ausentes: ${miss[*]}"; exit 1; }
+smoke_tests(){
+  source .env 2>/dev/null || true
+  declare -A URLS=(
+    [Safira]="http://localhost:${PORT_SAFIRA:-5678}/healthz"
+    [Admin]="http://localhost:${PORT_ADMIN:-5680}/healthz"
+    [MinIO]="http://localhost:${PORT_MINIO_CONSOLE:-9001}"
+    [Ollama]="http://localhost:${PORT_OLLAMA:-11434}"
+  )
+  log "🔎 Smoke-tests:"
+  for name in "${!URLS[@]}"; do
+    url=${URLS[$name]}
+    if curl -fsSL --max-time "$SMOKE_TIMEOUT" "$url" >/dev/null; then
+      good "$name OK  ($url)"
+    else
+      printf "${RED}• %s falhou%s  → %s\n" "$name" "$RESET" "$url"
+    fi
+  done
 }
 
-$dev || { check_files; check_secrets; }
-ensure_dirs; fix_permissions
+show_endpoints(){
+  source .env 2>/dev/null || true
+  cat <<EOF
 
-show_endpoints(){ source .env || true; cat <<EOF
-Safira (n8n)  http://localhost:${PORT_SAFIRA:-5678}
-Admin (n8n)   http://localhost:${PORT_ADMIN:-5680}
-Venom API     http://localhost:${PORT_VENOM:-3001}
-STT           http://localhost:${PORT_STT:-9000}
-CSM/TTS       http://localhost:${PORT_CSM:-5050}
-Ollama        http://localhost:${PORT_OLLAMA:-11434}
+${BOLD}Endpoints úteis:${RESET}
+Safira (n8n)    → http://localhost:${PORT_SAFIRA:-5678}
+Admin (n8n)     → http://localhost:${PORT_ADMIN:-5680}
+MinIO Console   → http://localhost:${PORT_MINIO_CONSOLE:-9001}
+Grafana         → http://localhost:${PORT_GRAFANA:-3000}
+Traefik dash    → http://localhost (se exposto)
 EOF
 }
-list_profiles(){ banner "📂  Profiles disponíveis"; grep -A1 '^profiles:' -n docker-compose.yml | awk -F: '/^ *[a-zA-Z0-9_-]+:$/ {print $2}' | sort -u; }
-completion_script(){ cat <<'BASH'
-_complete_safira(){
-  local cur=${COMP_WORDS[COMP_CWORD]}
-  COMPREPLY=( $(compgen -W "up down restart status logs prune profiles completion help" -- "$cur") )
-}
-complete -F _complete_safira run.sh
-BASH
+
+doctor(){
+  ensure_docker
+  [[ -f .env ]] || fail ".env ausente. Rode setup.sh primeiro."
+  DC config >/dev/null || fail "docker-compose.yml inválido."
+  good "Compose válido, Docker ok, .env presente."
 }
 
-case $action in
-  up)       banner "🚀  Subindo stack (profile: ${profile:-default})"; compose_up; wait_healthy; show_endpoints ;;
-  down)     banner "🛑  Derrubando stack"; compose_down ;;
-  restart)  compose_down; compose_up; wait_healthy ;;
-  status)   compose_status; compose ps --filter "status=exited" && true ;;
-  logs)     [[ -z $svc ]] && { error "Informe ./run.sh logs <service> [--save]"; exit 1; };
-            $save_logs && compose logs "$svc" > "logs/${svc}_$(date +%F_%H%M).log" && info "📝 Logs salvos" || compose logs -f "$svc" ;;
-  prune)    $prune_soft && { docker image prune -f; docker container prune -f; } || docker system prune -f --volumes ;;
-  profiles) list_profiles ;;
-  completion) completion_script ;;
-  help) echo "Ver README" ;;
+# ─── Commands ───────────────────────────────────────────────────────────────
+cmd=${1:-up}; shift || true
+case $cmd in
+  first)   # primeiro boot “all-in-one”
+    ensure_docker
+    DC pull
+    DC up -d
+    wait_healthy
+    smoke_tests
+    show_endpoints
+    ;;
+  up)
+    ensure_docker
+    DC up -d
+    wait_healthy
+    show_endpoints
+    ;;
+  down)
+    ensure_docker
+    DC down
+    ;;
+  restart)
+    ensure_docker
+    DC down
+    DC up -d
+    wait_healthy
+    show_endpoints
+    ;;
+  status)
+    ensure_docker
+    DC ps --format "table {{.Service}}\t{{.State}}\t{{.Health}}\t{{.PublishedPorts}}"
+    ;;
+  logs)
+    ensure_docker
+    svc=${1:-}; [[ -z $svc ]] && fail "Uso: ./run.sh logs <serviço>"
+    DC logs -f "$svc"
+    ;;
+  doctor)  doctor ;;
+  help|*)
+    cat <<HLP
+Uso: ./run.sh <comando>
+
+  first       Primeiro boot: pull + up + tests
+  up          Sobe (ou recria se necessário)
+  down        Derruba stack
+  restart     down + up
+  status      Tabela de estado
+  logs <svc>  Log follow serviço
+  doctor      Diagnóstico rápido
+HLP
+    ;;
 esac
-
-read -n 1 -s -r -p "🚀 Pressione qualquer tecla para sair..."
