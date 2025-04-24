@@ -1,5 +1,0 @@
-fastapi>=0.110,<0.111
-uvicorn[standard]>=0.29,<0.30
-transformers>=4.40
-torch>=2.2          # vai puxar CUDA se tiver GPU
-pillow

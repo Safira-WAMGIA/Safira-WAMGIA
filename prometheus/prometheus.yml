@@ -1,1 +1,0 @@
-global:\n  scrape_interval: 15s\nscrape_configs:\n  - job_name: prometheus\n    static_configs: [{ targets: ["localhost:9090"] }]

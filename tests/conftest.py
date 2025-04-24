@@ -1,1 +1,0 @@
-# Configurações globais do Pytest
