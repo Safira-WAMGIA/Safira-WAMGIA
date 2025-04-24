@@ -60,17 +60,6 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 
 ```mermaid
-%%{ init : {
-  "theme": "default",
-  "themeVariables": {
-    "primaryColor": "#e0f7fa",
-    "edgeLabelBackground":"#ffffff",
-    "tertiaryColor": "#fce4ec"
-  },
-  "flowchart": { "nodeSpacing": 40, "rankSpacing": 25 },
-  "securityLevel": "loose"
-}}%%
-
 graph TD
   classDef core fill:#D0E6FF,stroke:#0066CC,stroke-width:2px,color:#003366;
   classDef voice fill:#FFF3E0,stroke:#FF9800,stroke-width:2px,color:#E65100;
