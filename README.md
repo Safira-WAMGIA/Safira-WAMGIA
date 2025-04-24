@@ -125,6 +125,7 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 
 ```mermaid
+%%{ init: { "flowchart": { "direction": "TB" } } }%%
 graph TD
 
   VENOM["Venom (WhatsApp)"]
