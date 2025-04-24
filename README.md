@@ -60,30 +60,57 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 
 ```mermaid
-
 graph TD
-  VENOM["WhatsApp (Venom)"]
-  VENOM --> CORE["n8n (Orquestrador)"]
 
-  subgraph Processamento_Voz
-    CORE --> WHISPER["Whisper (STT)"]
-    WHISPER --> SESANE["SESANE (Emocao)"]
-    SESANE --> OLLAMA["Ollama (LLM)"]
-    OLLAMA --> COQUI["Coqui (TTS)"]
+  VENOM["Venom (WhatsApp)"]
+  VENOM --> CORE["n8n (Core Orquestrador)"]
+
+  subgraph Classificacao da Entrada
+    CORE -->|Verifica tipo de conteúdo| CLASSIFICA["Classificador: texto, imagem ou áudio"]
+    CLASSIFICA -->|Áudio| COQUI["Coqui (STT - transcrição de áudio)"]
+    CLASSIFICA -->|Imagem| BLIP2["BLIP2 (OCR de imagem)"]
+    CLASSIFICA -->|Texto| OLLAMA_1["Ollama (LLM - entendimento de texto)"]
+    COQUI --> OLLAMA_2["Ollama"]
+    BLIP2 --> OLLAMA_3["Ollama"]
   end
 
-  subgraph Processamento_Imagem
-    CORE --> BLIP2["BLIP2 (Leitor de Imagem)"]
-    BLIP2 --> OLLAMA
-    OLLAMA --> SD["Stable Diffusion"]
+  subgraph Processo Decisório (n8n)
+    OLLAMA_1 --> CORE
+    OLLAMA_2 --> CORE
+    OLLAMA_3 --> CORE
+    CORE -->|Executa fluxos| MODULO["Fluxograma n8n"]
+    MODULO -->|Decide resposta| DECISAO["Responder com texto, voz ou imagem?"]
   end
 
-  subgraph Persistencia
+  DECISAO -->|Resposta em texto| VENOM_TXT["Venom envia texto"]
+
+  DECISAO -->|Resposta em voz| WHISPER["Whisper (TTS - texto para áudio)"]
+  WHISPER --> CORE
+  CORE --> VENOM_AUDIO["Venom envia áudio"]
+
+  DECISAO -->|Resposta em imagem| SD["Stable Diffusion"]
+  SD --> CORE
+  CORE --> VENOM_IMG["Venom envia imagem"]
+
+  COQUI --> SESANE["SESANE (análise emocional)"]
+  SESANE --> CORE
+  SESANE --> OLLAMA_2
+  SESANE --> MODULO
+
+  CORE --> TELEGRAM["Canal Telegram"]
+  CORE --> INSTAGRAM["Canal Instagram"]
+
+  subgraph Infraestrutura
     CORE --> POSTGRES["PostgreSQL"]
     CORE --> REDIS["Redis"]
     CORE --> MINIO["MinIO"]
-    VENOM --> REDIS
-    VENOM --> POSTGRES
+    CORE --> TRAEFIK["Traefik"]
+    TRAEFIK --> NGINX["NGINX"]
+  end
+
+  subgraph Admin
+    CORE --> JIRA["Jira"]
+    CORE --> JENKINS["Jenkins"]
     JIRA --> POSTGRES
     JENKINS --> POSTGRES
   end
@@ -92,18 +119,6 @@ graph TD
     CORE --> PROMETHEUS["Prometheus"]
     PROMETHEUS --> GRAFANA["Grafana"]
   end
-
-  subgraph Administracao
-    CORE --> JIRA["Jira"]
-    CORE --> JENKINS["Jenkins"]
-  end
-
-  subgraph Infraestrutura
-    CORE --> TRAEFIK["Traefik"]
-    TRAEFIK --> NGINX["NGINX"]
-  end
-
-
 ```
 
 ---
