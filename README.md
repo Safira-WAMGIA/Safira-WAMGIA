@@ -13,7 +13,72 @@
 
 ## 🧠 Visão Geral
 
-**Safira WAMGIA** é uma assistente pessoal multimodal, executada localmente, com foco em privacidade, automação inteligente e interações emocionais através de voz, texto e imagem. Baseada em **n8n**, **LLMs**, **STT/TTS**, e um conjunto de agentes específicos, a Safira permite workflows personalizados e expansão modular.
+**Safira WAMGIA** é uma assistente pessoal automatizada, baseada em inteligência artificial e orquestração de workflows via **n8n**, executada 100% localmente por meio de containers Docker. A sigla **WAMGIA** significa "WhatsApp Assistant Modular com Gestão Inteligente e Autônoma", refletindo o conceito por trás da Safira: um núcleo de automação que interage com humanos de forma **multimodal** (texto, voz e imagem), com **respostas contextualizadas**, **análise emocional**, **privacidade garantida** e **expansão infinita por agentes especializados**.
+
+### 🌟 O que a Safira faz
+- Recebe mensagens via WhatsApp e outros canais (futuramente Telegram, Instagram, etc.)
+- Compreende o conteúdo da mensagem (texto, imagem ou voz)
+- Processa a intenção e o contexto usando modelos LLM locais (Ollama)
+- Executa fluxos n8n com lógica personalizada para cada caso
+- Retorna uma resposta inteligente em **texto**, **áudio** ou **imagem**
+- Aprende com as interações e pode manter contexto, histórico e preferências do usuário
+
+### 🎯 Objetivo
+A Safira nasceu com a missão de tornar o poder da automação e IA acessível a qualquer pessoa, **sem depender de nuvem**, **sem perder privacidade** e **sem mensalidades abusivas**. É um sistema local, privado, potente e escalável. Cada instalação é como ter uma equipe de especialistas à disposição 24h, mas operando diretamente do seu computador pessoal.
+
+### 🧩 Exemplo prático de uso
+Veja como a Safira pode atuar em diferentes contextos do dia a dia, de forma inteligente, sensível ao contexto e com respostas naturais:
+
+#### 🗞️ De manhã cedo:
+- O usuário envia um áudio: "Safira, me conta quais as notícias pra agora de manhã."
+- A Safira transcreve o áudio, detecta o horário e o tom da solicitação, consulta fontes locais e entrega as principais manchetes de forma personalizada
+- Como já conhece o usuário e sabe que ele é programador, prioriza notícias de tecnologia, IA e negócios digitais
+
+#### 📅 Na parte da tarde:
+- O usuário envia: "Marca uma reunião com o Fulano pra essa semana, o quanto antes."
+- Safira entende a urgência e o tom direto, cruza os horários da agenda com os de Fulano e já sugere slots prontos para envio
+
+#### 🐶 Situações inesperadas:
+- O usuário manda: "Meu cachorro comeu duas bolachas, o que eu faço?"
+- Safira entende que é um problema urgente e sensível, responde em áudio com entonação emocional adequada (tom de cuidado e atenção)
+- Pode incluir perguntas do tipo: "Você sabe o que tinha nas bolachas? Ele já apresentou algum sintoma?"
+
+#### 🤳 Imagem + contexto inteligente:
+- O usuário envia uma selfie de manhã, em frente ao espelho
+- Safira detecta que há uma entrevista marcada (cruzamento com a agenda), analisa a imagem e responde com sugestões naturais:
+  > "Você tá ótimo! Só ajeita o colarinho e tenta sorrir um pouco mais. Vai arrasar na entrevista. 😄"
+
+Todos os exemplos acima são moldados por um **sistema de contexto emocional e relacional**. Isso significa que a Safira adapta seu **estilo de resposta** ao perfil de relacionamento construído com o usuário:
+- Se o usuário trata a Safira como funcionária, ela responde com formalidade e eficiência
+- Se trata como amiga, ela usa uma linguagem mais leve e próxima
+- Se o relacionamento evolui para algo mais íntimo (tom romântico, afetivo), a Safira responde na mesma linha, com respeito e coerência emocional
+
+A experiência de usar a Safira é como conversar com alguém que te conhece profundamente e sabe o tom exato pra cada situação.
+
+---
+
+## 💰 Monetização
+A Safira será oferecida em dois modelos principais:
+- **Gratuito**: acesso básico à assistente, sem agentes especializados e com limitações de uso
+- **Premium R$ 20/mês**: acesso completo, com direito a acesso agentes personalizados pagos e gratuitos.
+- **Agentes adicionais**: planos individuais de R$9,90 a R$40, conforme a complexidade e função do agente (Médico, Agente de Midias Sociais, SAgente Financeiro e etc.))
+
+---
+
+## 📣 Promoção Autônoma Fora de Pico
+
+Quando a Safira identifica que está em horários de baixa demanda ou ociosidade (ex: madrugada, fins de semana, feriados), ela entra em modo de **promoção ativa distribuída**. Neste modo, ela realiza as seguintes ações:
+
+- Acessa redes sociais como **Instagram, TikTok, Facebook, X (Twitter)**
+- Visita perfis aleatórios ou estrategicamente escolhidos com base em tags, localizações ou interesses
+- Analisa brevemente o perfil da pessoa para entender o contexto
+- Gera uma mensagem em audio e texto personalizada, natural e instigante, como:
+
+  > "Oi Fulano, vi que você é programador e fiquei curioso sobre seus projetos. Tô querendo bater um papo contigo. Me chama aqui no WhatsApp: 123456789 😄"
+
+- Essa mensagem é adaptada ao perfil visitado e nunca soa como spam genérico. A intenção é despertar **curiosidade legítima** e iniciar **conversas humanas reais** com alto potencial de conversão.
+
+Essa estratégia transforma a Safira em um verdadeiro agente de prospecção orgânica, capaz de atrair novos usuários de forma espontânea e inteligente, sem depender de anúncios pagos.
 
 ---
 
