@@ -9,7 +9,6 @@ version: "3.9"
 
 x-common-env: &common-env
   env_file: [.env]
-  restart: unless-stopped
   networks: [safira-net]
 
 x-health-pg: &health-pg
@@ -33,18 +32,29 @@ x-logging: &default-log
 
 services:
   # ───── Dados & Storage ─────
+
   minio:
-    image: minio/minio
+    image: minio/minio:latest
     command: server /data --console-address ":9001"
+
     ports:
       - "${PORT_MINIO_API:-9000}:9000"
       - "${PORT_MINIO_CONSOLE:-9001}:9001"
-    volumes: [minio-data:/data]
+
+    volumes:
+      - minio-data:/data          # volume já declarado no bloco volumes:
+
     <<: [*common-env, *health-http, *default-log]
+
     environment:
-      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-      - MINIO_ROOT_PASSWORD_FILE=/run/secrets/minio_pwd
-    secrets: [minio_pwd]
+      # usuário fica em variável de ambiente sem problema
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      # senha vem **do segredo** que o Docker monta em /run/secrets
+      MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_pwd
+
+    secrets:
+      - minio_pwd                 # só referencia o que está no bloco secrets:
+
 
   db-safira:
     image: postgres:15
@@ -157,7 +167,6 @@ services:
         HF_TOKEN: ${HF_TOKEN} 
         TTS_ENGINE: csm
     image: safira/csm:local
-    pull_policy: never
     ports: ["${PORT_CSM:-5050}:8000"]
     <<: [*common-env, *health-http, *default-log]
 
@@ -166,7 +175,6 @@ services:
     build:
       context: ./voice/input
     image: safira/stt:cpu
-    pull_policy: never
     ports: ["${PORT_STT:-9100}:9000"]
     <<: [*common-env, *health-http, *default-log]
 
@@ -255,3 +263,4 @@ secrets:
     external: true
   jenkins_admin_pwd:
     external: true
+
