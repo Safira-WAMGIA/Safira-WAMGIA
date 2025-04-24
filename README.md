@@ -60,42 +60,49 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 
 ```mermaid
+
 graph TD
-  SAFIRA[Safira WAMGIA]
+  VENOM[WhatsApp (Venom)]
+  VENOM --> CORE[n8n (Orquestrador)]
 
-  subgraph Core_Inteligencia
-    SAFIRA --> CORE["Safira-Core (n8n)"]
-    CORE --> VENOM["Venom (WhatsApp)"]
-    CORE --> SESANE["SESANE (emocao por voz)"]
+  subgraph Processamento_Voz
+    CORE --> WHISPER[Whisper (STT)]
+    WHISPER --> SESANE[SESANE (Emoção)]
+    SESANE --> OLLAMA[LLM Ollama]
+    OLLAMA --> COQUI[Coqui (TTS)]
   end
 
-  subgraph Voz_Imagem
-    CORE --> WHISPER["Whisper (STT)"]
-    CORE --> COQUI["Coqui (TTS)"]
-    WHISPER --> OLLAMA["Ollama (LLM)"]
-    COQUI --> OLLAMA
-    CORE --> BLIP2["BLIP2 (Leitor de Imagem)"]
-    OLLAMA --> SD["Stable Diffusion"]
+  subgraph Processamento_Imagem
+    CORE --> BLIP2[BLIP2 (Leitor Imagem)]
+    BLIP2 --> OLLAMA
+    OLLAMA --> SD[Stable Diffusion]
   end
 
-  subgraph Admin_Observabilidade
-    CORE --> PROMETHEUS["Prometheus"]
-    PROMETHEUS --> GRAFANA["Grafana"]
-    CORE --> JIRA["Jira"]
-    CORE --> JENKINS["Jenkins"]
-  end
-
-  subgraph Infraestrutura
-    CORE --> TRAEFIK["Traefik"]
-    TRAEFIK --> NGINX["NGINX"]
-    CORE --> REDIS["Redis"]
-    CORE --> MINIO["MinIO"]
-    CORE --> POSTGRES["PostgreSQL"]
-    VENOM --> REDIS
+  subgraph Persistência
+    CORE --> POSTGRES[(PostgreSQL)]
+    CORE --> REDIS[(Redis)]
+    CORE --> MINIO[(MinIO)]
     VENOM --> POSTGRES
+    VENOM --> REDIS
     JIRA --> POSTGRES
     JENKINS --> POSTGRES
   end
+
+  subgraph Observabilidade
+    CORE --> PROMETHEUS
+    PROMETHEUS --> GRAFANA
+  end
+
+  subgraph Administração
+    CORE --> JIRA
+    CORE --> JENKINS
+  end
+
+  subgraph Infra
+    CORE --> TRAEFIK
+    TRAEFIK --> NGINX
+  end
+
 
 ```
 
