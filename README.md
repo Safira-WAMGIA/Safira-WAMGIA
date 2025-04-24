@@ -12,258 +12,275 @@
 ![WhatsApp](https://img.shields.io/badge/WhatsApp-Venom‑bot-25D366?logo=whatsapp&logoColor=white&style=flat-square)
 
 
----
-**Safira WAMGIA** é uma plataforma integrada de automação e inteligência artificial projetada para assistentes pessoais, interações multimodais e automação de fluxos, com o WhatsApp como principal canal de comunicação. A plataforma utiliza uma arquitetura baseada em microsserviços, garantindo escalabilidade, modularidade e facilidade de manutenção.
+# 🔷 Safira WAMGIA – README 2025
+
+![Versão](https://img.shields.io/badge/Vers%C3%A3o-2025.04%E2%80%91rev%E2%80%91stable-blue?style=flat-square)
+![Licença](https://img.shields.io/badge/Licen%C3%A7a-Particular-red?style=flat-square)
+![Ambiente](https://img.shields.io/badge/Ambiente-Docker%20Compose-blueviolet?style=flat-square)
+![Infra](https://img.shields.io/badge/Infraestrutura-Microsservi%C3%A7os-orange?style=flat-square)
 
 ---
 
-## 🚀 Visão Geral da Arquitetura
+## 🧠 Visão Geral
 
-A **Safira WAMGIA** é estruturada em módulos independentes, utilizando **Docker Compose** para orquestração de containers e isolamento de ambiente. A stack completa inclui:
+**Safira WAMGIA** é uma assistente pessoal multimodal, executada localmente, com foco em privacidade, automação inteligente e interações emocionais através de voz, texto e imagem. Baseada em **n8n**, **LLMs**, **STT/TTS**, e um conjunto de agentes específicos, a Safira permite workflows personalizados e expansão modular.
 
-- **Bases de Dados**: PostgreSQL, Redis, MinIO (Object Storage)
-- **Orquestração e Gateway**: Traefik
-- **Core Workflow**: N8N
-- **IA e Serviços**:
-  - LLaMA (Ollama): Modelos locais de IA para NLP
-  - Venom-bot: Integração com WhatsApp
-  - FastAPI: Backend para CSM, TTS/STT e processamento de imagens
-- **Observabilidade**: Prometheus, Grafana, Loki
-- **CI/CD**: Jenkins, GitHub Actions
-- **Apps de Gestão**: Jira Software
+---
+
+## 🧱 Arquitetura Geral (Dockerized Stack)
+
+A Safira opera via **Docker Compose**, utilizando 17 containers principais, separados por função:
+
+### 🔹 Core e Inteligência
+| Nome            | Função                                 | Tags |
+|------------------|-------------------------------------------|------|
+| Safira-Core      | Motor principal dos fluxos n8n             | core |
+| Whatsapp (Venom) | Integração via WhatsApp (entrada)         | comunicacao |
+| LLM-Ollama       | Modelo LLM local (NLP e automação)         | llm, modelo |
+| SESANE           | Análise emocional e contexto de voz         | modelo |
+
+### 🔉 Voz (Entrada e Saída)
+| Nome     | Função                                   | Tags |
+|-----------|-----------------------------------------------|------|
+| Whisper   | STT: Transcrição de voz para texto             | output, audio |
+| Coqui     | TTS: Conversão de texto para voz humanizada    | input, audio |
+
+### 📊 Administração e Observabilidade
+| Nome        | Função                          | Tags |
+|-------------|----------------------------------|------|
+| Prometheus  | Coleta de métricas                 | admin |
+| Grafana     | Dashboards e visualização          | admin |
+| Jira        | Gestão de tarefas e roadmap        | admin |
+| Jenkins     | CI/CD e automação de deploy        | infra, admin |
+
+### 🌐 Infraestrutura
+| Nome     | Função                                | Tags |
+|----------|------------------------------------|------|
+| Traefik  | Gateway reverso / proxy dinâmico   | infra |
+| NGINXS   | Webserver / roteamento interno     | infra |
+| Redis    | Cache e mensagens leves            | infra |
+| MinIO    | Armazenamento de objetos (S3-like) | infra |
+| Postgree | Banco de dados principal           | infra, core |
+
+### 🖼️ Imagem (Input/Output)
+| Nome               | Função                                | Tags |
+|--------------------|------------------------------------------|------|
+| BLIP2              | Leitura e compreensão de imagens          | imagem, input |
+| Stable Diffusion   | Geração de imagens via texto (T2I)       | imagem, output |
 
 ---
 
 ## 📂 Estrutura do Repositório
 
-```
-safira-wamgia/
-├── ai-functions        # Funções personalizadas de IA
-├── backup              # Serviços de backup
-├── csm                 # Serviço para Speech Synthesis (TTS)
-├── docs                # Documentação via MkDocs
-├── image
-│   ├── input           # Processamento de imagens (OCR)
-│   └── output          # Geração de imagens via IA
-├── loki                # Configuração do Loki para logging centralizado
-├── prometheus          # Monitoramento de métricas
-├── traefik             # Gateway e proxy reverso
-├── venom               # Integração WhatsApp (Venom-bot)
-├── voice
-│   └── input           # Speech Recognition (STT)
-├── shared              # Recursos compartilhados entre serviços
-├── .env                # Variáveis de ambiente (template)
-├── docker-compose.yml  # Orquestrador principal
-├── run.sh              # Script principal de execução
-├── setup.sh            # Configuração inicial automatizada
-└── secrets.sh          # Gestão de secrets Docker
-```
+A estrutura de diretórios da Safira é organizada de forma modular e autogerada pelo script `run.sh`. Isso garante que todos os serviços personalizados tenham seus arquivos essenciais criados dinamicamente, evitando falhas de build e facilitando onboarding.
 
----
-
-## 🛠️ Pré-requisitos
-
-Certifique-se de que você possui as seguintes dependências instaladas antes de continuar:
-
-- **Docker**: >= 24.x
-- **Docker Compose Plugin**: >= 2.20.x
-- **Bash**: >= 5.x
-- **Git**: >= 2.x
-
----
-
-## ⚙️ Setup Inicial
-
-Para configurar e iniciar o ambiente, siga as instruções abaixo:
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/caioross/Safira-WAMGIA.git
-   cd safira-wamgia
-   ```
-
-2. Configure os scripts:
-   ```bash
-   chmod +x setup.sh run.sh secrets.sh
-   ./setup.sh
-   ./secrets.sh
-   ```
-
-> 🚨 **Nota**: Em ambientes Docker Swarm, os secrets serão configurados automaticamente. Para desenvolvimento local, utilize a flag `--dev`.
-
----
-
-## 🐳 Gerenciamento de Serviços com Docker
-
-Use o script `run.sh` para gerenciar facilmente a stack Safira:
-
-| Comando                       | Descrição                                    |
-|-------------------------------|----------------------------------------------|
-| `./run.sh up`                 | Subir todos os serviços                     |
-| `./run.sh down`               | Parar todos os serviços                     |
-| `./run.sh restart`            | Reiniciar a stack completa                  |
-| `./run.sh status`             | Consultar o status atual da stack           |
-| `./run.sh logs <serviço>`     | Exibir logs de um serviço específico (com `--save` para salvar os logs) |
-
----
-
-## 🧩 Componentes e Endpoints
-
-| **Componente**      | **Descrição**                          | **Endpoint**                    |
-|---------------------|----------------------------------------|----------------------------------|
-| **N8N Core**        | Workflow automation principal         | [http://localhost:5678](http://localhost:5678) |
-| **N8N Admin**       | Administração de workflows            | [http://localhost:5680](http://localhost:5680) |
-| **Venom API**       | Integração com WhatsApp               | [http://localhost:3001](http://localhost:3001) |
-| **Ollama (LLaMA)**  | Modelos locais de IA para NLP         | [http://localhost:11434](http://localhost:11434) |
-| **MinIO**           | Armazenamento de objetos (S3)         | [http://localhost:9001](http://localhost:9001) |
-| **Grafana**         | Dashboard para métricas e logs        | [http://localhost:3000](http://localhost:3000) |
-| **Prometheus**      | Monitoramento de métricas             | [http://localhost:9090](http://localhost:9090) |
-| **Traefik**         | Gateway de acesso e proxy reverso     | [http://localhost](http://localhost) |
-
----
-
-## 🔐 Gestão de Secrets
-
-O script `secrets.sh` permite gerenciar os segredos da aplicação de forma segura. Segredos incluem:
-
-- Senhas do PostgreSQL (Safira, Pagamento, Jira)
-- Senhas do Redis e MinIO
-- Tokens JWT e secrets do Supabase
-- Senha do administrador do Grafana
-
-### Gerar ou atualizar secrets:
 ```bash
+safira-wamgia/
+├── build/                    # Diretório base para todos os serviços customizados
+│   ├── venom/                # Serviço WhatsApp (venom-bot + main.js + Dockerfile)
+│   ├── ollama/               # LLM local (base: ollama)
+│   ├── sesame/               # Agente SESANE
+│   ├── whisper/              # STT via Faster-Whisper
+│   ├── coqui/                # TTS via Coqui TTS + Flask
+│   ├── blip2/                # Leitor de imagens com BLIP2
+│   ├── auto1111/             # Geração de imagem (Stable Diffusion)
+│   ├── jira/                 # Gestão de tarefas (base: Jira)
+│   ├── jenkins/              # Automação CI/CD (Jenkins)
+│   ├── prometheus/ grafana/  # Monitoramento
+│   ├── traefik/ 
+│   ├── nginxs/ 
+│   ├── redis/ 
+│   ├── minio/ 
+│   ├── postgres/
+├── db/                       # Dados persistentes ou iniciais de banco (se usado)
+├── docs/                     # Documentação do projeto (ex: MkDocs)
+├── workflows/                # Fluxos, modelos e templates de fluxos de trabalho do n8n padrão.
+├── scripts/                  # Scripts utilitários: secrets.sh, release.sh, etc.
+├── .env                      # Arquivo de variáveis de ambiente (gerado via run.sh)
+├── .env.example              # Template base do .env
+├── docker-compose.yml        # Orquestrador principal
+├── run.sh                    # Script principal: cria tudo e sobe stack
+```
+
+### 🧠 Observações
+- O `run.sh` cuida da criação dos arquivos `.py`, `Dockerfile`, `main.js` e `package.json` quando ausentes.
+- Serviços que exigem setup remoto (ex: Jira) exibirão uma mensagem de orientação no terminal.
+- O repositório foi projetado para funcionar de forma plug-and-play local, com baixa dependência de cloud e foco em autonomia.
+
+---
+
+## 🛠️ Setup Inicial
+
+Todo o processo de preparação, configuração e execução da stack Safira é realizado exclusivamente através do script `run.sh`. Esse script é interativo, autodocumentado e modular, permitindo subir serviços individualmente ou reiniciar a stack inteira com segurança.
+
+### ✅ O que o `run.sh` faz:
+- Verifica se Docker e Docker Compose estão corretamente instalados
+- Garante a existência do arquivo `.env`, criando a partir do `.env.example` se necessário
+- Valida e solicita secrets ausentes (como senhas de Redis, Postgres, MinIO, etc.)
+- Cria diretórios essenciais e arquivos mínimos para cada serviço personalizado (como Venom, Coqui, Whisper, BLIP2, SESANE...)
+- Clona repositórios base (ex: Stable Diffusion)
+- Verifica se os Dockerfiles necessários estão presentes e prontos
+- Executa o `docker compose up -d --build`
+- Exibe os principais endpoints acessíveis da plataforma
+
+### 🚀 Como rodar:
+1. Clone o repositório e dê permissão de execução ao script:
+
+```bash
+git clone https://github.com/caioross/Safira-WAMGIA.git
+cd safira-wamgia
+chmod +x run.sh
+```
+
+2. Inicie a stack:
+```bash
+./run.sh
+```
+
+### ⚙️ Flags disponíveis
+Você pode usar o `run.sh` com parâmetros adicionais:
+
+| Comando               | Descrição                                        |
+|----------------------|--------------------------------------------------|
+| `./run.sh`           | Sobe todos os serviços com build automático     |
+| `./run.sh --no-build`| Sobe serviços sem recompilar imagens            |
+| `./run.sh --reset`   | Derruba tudo, remove volumes e redes            |
+| `./run.sh --status`  | Mostra status atual dos serviços                |
+| `./run.sh --only-core`| Sobe apenas n8n, WhatsApp, Postgres             |
+| `./run.sh --only-ai` | Sobe somente os modelos IA (Whisper, Coqui etc) |
+
+> 🧠 O `run.sh` é seguro, modular e inteligente: roda só o necessário, e nunca executa builds ou resets desnecessários sem confirmação.
+bash
+git clone https://github.com/caioross/Safira-WAMGIA.git
+cd safira-wamgia
+chmod +x setup.sh run.sh secrets.sh
+./setup.sh
 ./secrets.sh
 ```
 
----
-
-## 📖 Documentação
-
-A documentação técnica é gerada com **MkDocs**. Para visualizar:
+2. Suba os containers:
 
 ```bash
-cd docs
-mkdocs serve
-```
-Acesse a documentação em: [http://localhost:8000](http://localhost:8000).
-
----
-
-## 🔄 Integração Contínua (CI/CD) com Git + Scripts
-
-- **GitHub Actions**: Pipelines de validação (linting, testes unitários e build de imagens Docker).
-- **Jenkins**: Pipelines avançados para integração e deployment contínuos.
-
-O projeto Safira utiliza uma estratégia de versionamento baseada em **Git Flow simplificado**, com integração contínua via **GitHub Actions** e deploy gerenciado por versões estáveis em `main`.
-
-### 🧬 Branches principais
-
-| Branch         | Função                                       |
-|----------------|----------------------------------------------|
-| `develop`      | Desenvolvimento contínuo                     |
-| `release/x.x.x`| Pré-produção (validação via CI)              |
-| `main`         | Produção (builds estáveis e versões finais)  |
-
----
-
-### 📜 Scripts de automação
-
-Para facilitar a gestão de versões, utilizamos scripts Bash que automatizam cada etapa:
-
-| Script                | Descrição                                                              |
-|------------------------|------------------------------------------------------------------------|
-| `./push-dev.sh`        | Envia alterações locais para `develop`                                |
-| `./promote-release.sh` | Cria uma branch `release/vX.Y.Z` a partir da `develop`                |
-| `./promote-main.sh`    | Faz merge de `release/vX.Y.Z` para `main` e cria a tag `vX.Y.Z`       |
-| `./release.sh`         | (Opcional) Gera uma release no GitHub com changelog e metadados       |
-
----
-
-### ⚙️ Ciclo completo de CI/CD
-
-
-1. Codifique normalmente e envie para develop
-```bash
-./push-dev.sh "feat: adiciona agente financeiro"
-```
-2. Quando estiver pronto para validação:
-```bash
-./promote-release.sh 1.0.0
-```
-(GitHub Actions rodará build/testes na release/v1.0.0)
-
-3. Após validação com sucesso:
-```bash
-./promote-main.sh 1.0.0
+./run.sh up
 ```
 
-GitHub Actions na main irá:
-- Buildar e publicar a imagem
-- Exportar compose-resolved.yml
-- (Opcional) Criar release com ./release.sh
 ---
 
-## 📊 Observabilidade e Logs
+## 🌐 Endpoints
 
-- **Métricas**: Monitoramento integrado com Prometheus e Grafana.
-- **Logs Centralizados**: Gerenciados pelo Loki com visualização em Grafana.
+Abaixo estão listados os principais endpoints HTTP expostos pelos serviços da stack local. Essas portas são mapeadas diretamente no `docker-compose.yml` e podem ser acessadas no navegador ou via API local.
 
----
+| Componente           | Descrição                                     | URL                                |
+|----------------------|-----------------------------------------------|-------------------------------------|
+| N8N Core             | Automação de fluxos (assistente principal)    | http://localhost:5678              |
+| Venom API (WhatsApp) | Integração com WhatsApp via venom-bot         | http://localhost:3000              |
+| LLM Ollama           | Modelo de linguagem local                     | http://localhost:11434             |
+| SESANE               | Análise emocional de voz                      | http://localhost:8003              |
+| Whisper STT          | Transcrição de áudio para texto               | http://localhost:9000              |
+| Coqui TTS            | Geração de fala a partir de texto             | http://localhost:9001              |
+| BLIP2                | Leitura e descrição de imagens                | http://localhost:9003              |
+| Stable Diffusion     | Geração de imagem via prompt textual          | http://localhost:7860              |
+| Grafana              | Dashboards e visualização de métricas         | http://localhost:3001              |
+| Prometheus           | Coletor de métricas                           | http://localhost:9090              |
+| Jenkins              | Pipeline CI/CD local                          | http://localhost:8083              |
+| Jira                 | Gerenciamento de tarefas                      | http://localhost:8082              |
+| Traefik              | Gateway reverso para serviços HTTP            | http://localhost:8080              |
+| NGINX                | Servidor de arquivos estáticos / conteúdo     | http://localhost:8081              |
+| MinIO Console        | Interface S3 para arquivos e objetos          | http://localhost:9002              |
 
-## ✨ Recursos Suportados
+| Componente Interno   | Descrição                                     | Porta Interna                      |
+|----------------------|-----------------------------------------------|-------------------------------------|
+| PostgreSQL           | Banco de dados relacional                     | 5432                               |
+| Redis                | Cache e pub/sub de mensagens                  | 6379                               |
 
-| **Recurso**                  | **Status**       | **Observação**                        |
-|------------------------------|------------------|---------------------------------------|
-| Integração WhatsApp (Venom)  | ✅ Concluído     |                                       |
-| Automação de Workflows (N8N) | ✅ Concluído     |                                       |
-| Suporte a Multi-idiomas      | 🚧 Em Progresso | PT-BR implementado; EN e ES pendentes |
-| Cache Inteligente            | ⬜ Planejado    |                                       |
-| Integração com Gateways      | ⬜ Planejado    |                                       |
-
----
-
-## ❓ FAQ
-
-**1. O que fazer se o Docker Compose falhar com um erro de rede?**  
-Verifique se o Docker está devidamente configurado e com privilégios administrativos. Reexecute o comando `docker-compose up` com a flag `--force-recreate`.
-
-**2. Como adicionar novos secrets ao projeto?**  
-Use o script `secrets.sh` para gerenciar novos secrets de forma segura.
-
----
-
-## 🤝 Como Contribuir
-
-1. Faça um fork do projeto:
-   ```bash
-   git checkout -b feature/nova-funcionalidade
-   ```
-
-2. Realize commits claros:
-   ```bash
-   git commit -m "Descrição concisa"
-   ```
-
-3. Envie um pull request detalhado para revisão.
+> 💡 Observação: Serviços internos como PostgreSQL e Redis não expõem interface web, mas são essenciais para o funcionamento interno da stack. e Redis não possuem interface HTTP, mas estão disponíveis para conexões internas entre containers.
 
 ---
 
-## 📜 Licença
+## 🔐 Secrets e Segurança
 
-Este projeto é **Particular** e não está disponível para uso público sem autorização.
+Execute `./secrets.sh` para gerar os secrets obrigatórios. O script cobre:
+- PostgreSQL, Redis, MinIO
+- Tokens de API (Venom, Ollama, Supabase, etc)
+- JWTs e secrets de aplicação
+
+---
+
+## ♻️ Ciclo CI/CD
+
+| Branch             | Uso                             |
+|--------------------|----------------------------------|
+| `develop`          | Desenvolvimento ativo            |
+| `release/x.y.z`    | Versão candidata                |
+| `main`             | Versão estável                   |
+
+Scripts Bash automatizam o ciclo de releases:
+- `./push-dev.sh` → Sobe pra develop
+- `./promote-release.sh 1.2.3` → Cria release
+- `./promote-main.sh 1.2.3` → Sobe pro main com tag
 
 ---
 
-## 🚩 Roadmap Futuro
+## 📊 Observabilidade
 
-- [ ] Melhoria na arquitetura de filas e workers.
-- [ ] Implementação de caching inteligente.
-- [ ] Integração completa com gateways de pagamento.
-- [ ] Suporte multi-idioma completo (PT, EN, ES).
-- [ ] Expansão para serviços cloud (AWS/GCP/Azure).
+O módulo de observabilidade da Safira garante rastreamento completo da saúde dos serviços, análise de performance e auditoria de eventos. Ele é composto por:
+
+### 📈 Coleta de Métricas
+- **Prometheus**: coleta dados de serviços com suporte a `healthchecks`, uso de CPU, memória, tempo de resposta, latência de containers e serviços expostos via Traefik ou FastAPI.
+- **Exporters customizados** podem ser adicionados para serviços específicos como PostgreSQL ou Redis, para insights avançados.
+
+### 📊 Visualização e Dashboards
+- **Grafana**: conectado ao Prometheus, apresenta dashboards em tempo real com:
+  - Status de containers e recursos
+  - Métricas de uso por serviço (n8n, LLM, TTS/STT, etc.)
+  - Uptime e erros de healthcheck
+  - Tráfego do WhatsApp via Venom
+
+> O painel default do Grafana está disponível em `http://localhost:3000` com credenciais configuradas via `secrets.sh`
+
+### 🪵 Logs Centralizados
+- **Loki** (opcional): agrega e estrutura logs de todos os containers para análise via Grafana (modo Explore).
+- Logs podem ser filtrados por nível (`info`, `warning`, `error`) e por serviço, útil para depuração e auditoria de fluxos.
+
+### 🔔 Alertas e Notificações (planejado)
+- Integração futura com **Alertmanager** para notificar incidentes via e-mail, Telegram, Discord ou WhatsApp.
 
 ---
+
+## 🔍 Roadmap
+
+### ✅ Concluídos
+- [x] Integração com WhatsApp via Venom
+- [x] Pipeline de CI/CD local com GitHub Actions + scripts
+- [x] Conversão de voz para texto (Whisper) e TTS (Coqui)
+- [x] Geração e leitura de imagens com IA (Stable Diffusion + BLIP2)
+- [x] Análise emocional com SESANE
+- [x] Dashboard de métricas com Grafana + Prometheus
+- [x] Secrets automatizados via `secrets.sh`
+- [x] Setup completo com `run.sh`, `setup.sh`, `secrets.sh`
+
+### 🧪 Em Execução / Testes
+- [ ] Testes unitários automatizados por serviço (pytest, ruff)
+- [ ] Testes de stress e carga em Ollama e Whisper
+- [ ] Teste de fallback de LLM secundária (ex: GPT4All)
+- [ ] Modo "dev" com auto-reload + debug isolado
+
+### 🧩 A Fazer
+- [ ] Caching inteligente com Redis para consultas repetidas
+- [ ] Orquestração interna de agentes (modo LangChain-like)
+- [ ] Documentação de uso para colaborador/analista
+- [ ] Criação de perfil de execução leve (modo "mínimo")
+- [ ] Fallbacks para serviços de voz (STT/TTS) em caso de falha
+- [ ] Suporte a respostas multimodais nos fluxos n8n
+- [ ] Modularização do compose por perfil (admin/core/image/voz)
+- [ ] Configuração automática dos containers via script interativo (WIP)
+
+> 📌 Observação: O foco é funcionalidade local, offline-friendly e com resiliência total à falta de cloud.
+---
+
+## 📄 Licença
+
+Este projeto é **Particular**. Reprodução, distribuição ou uso sem permissão expressa está proibido.
 
 ✨ **Happy coding!**  
 Equipe Safira WAMGIA 🔮🚀
