@@ -61,68 +61,41 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 ```mermaid
 graph TD
-  classDef core fill:#D0E6FF,stroke:#0066CC,stroke-width:2px,color:#003366;
-  classDef voice fill:#FFF3E0,stroke:#FF9800,stroke-width:2px,color:#E65100;
-  classDef img fill:#E1F5FE,stroke:#0288D1,stroke-width:2px,color:#01579B;
-  classDef infra fill:#E8F5E9,stroke:#388E3C,stroke-width:2px,color:#1B5E20;
-  classDef admin fill:#F3E5F5,stroke:#8E24AA,stroke-width:2px,color:#4A148C;
-  classDef db fill:#FBE9E7,stroke:#D84315,stroke-width:2px,color:#BF360C;
+  SAFIRA[Safira WAMGIA]
 
-graph TD
-  SAFIRA((Safira WAMGIA))
-
-  subgraph 🧠 Core & Inteligência
-    CORE[["Safira-Core (n8n)"]]:::core
-    VENOM["Venom\n(WhatsApp)"]:::core
-    SESANE["SESANE\n(emoção por voz)"]:::core
-    CORE --> VENOM
-    CORE --> SESANE
+  subgraph Core_Inteligencia
+    SAFIRA --> CORE["Safira-Core (n8n)"]
+    CORE --> VENOM["Venom (WhatsApp)"]
+    CORE --> SESANE["SESANE (emocao por voz)"]
   end
 
-  subgraph 🔊 Voz & Imagem
-    WHISPER["((Whisper))\nSTT"]:::voice
-    COQUI["((Coqui))\nTTS"]:::voice
-    BLIP2["[[BLIP2]]\nLeitor de Imagem"]:::img
-    SD["[[Stable Diffusion]]"]:::img
-    OLLAMA["Ollama\n(LLM)"]:::core
-
-    CORE --> WHISPER
-    CORE --> COQUI
-    WHISPER --> OLLAMA
+  subgraph Voz_Imagem
+    CORE --> WHISPER["Whisper (STT)"]
+    CORE --> COQUI["Coqui (TTS)"]
+    WHISPER --> OLLAMA["Ollama (LLM)"]
     COQUI --> OLLAMA
-    BLIP2 --> OLLAMA
-    OLLAMA --> SD
+    CORE --> BLIP2["BLIP2 (Leitor de Imagem)"]
+    OLLAMA --> SD["Stable Diffusion"]
   end
 
-  subgraph 🛠️ Admin & Observabilidade
-    PROMETHEUS{"Prometheus"}:::admin
-    GRAFANA{{Grafana}}:::admin
-    JIRA["Jira\n(Tarefas)"]:::admin
-    JENKINS["Jenkins\n(CI/CD)"]:::admin
-    PROMETHEUS --> GRAFANA
-    CORE --> PROMETHEUS
-    CORE --> JIRA
-    CORE --> JENKINS
+  subgraph Admin_Observabilidade
+    CORE --> PROMETHEUS["Prometheus"]
+    PROMETHEUS --> GRAFANA["Grafana"]
+    CORE --> JIRA["Jira"]
+    CORE --> JENKINS["Jenkins"]
   end
 
-  subgraph 🧱 Infraestrutura
-    TRAEFIK(["Traefik\nReverse Proxy"]):::infra
-    NGINX(["NGINX\nStatic Server"]):::infra
-    REDIS(["Redis"]):::infra
-    MINIO(["MinIO\nObject Storage"]):::infra
-    POSTGRES(["PostgreSQL"]):::db
-    CORE --> TRAEFIK
-    TRAEFIK --> NGINX
-    CORE --> REDIS
-    CORE --> MINIO
-    CORE --> POSTGRES
+  subgraph Infraestrutura
+    CORE --> TRAEFIK["Traefik"]
+    TRAEFIK --> NGINX["NGINX"]
+    CORE --> REDIS["Redis"]
+    CORE --> MINIO["MinIO"]
+    CORE --> POSTGRES["PostgreSQL"]
     VENOM --> REDIS
     VENOM --> POSTGRES
     JIRA --> POSTGRES
     JENKINS --> POSTGRES
   end
-
-  SAFIRA --> CORE
 
 ```
 
