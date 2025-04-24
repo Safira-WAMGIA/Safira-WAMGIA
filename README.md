@@ -61,34 +61,53 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 ```mermaid
 graph TD
-  A[Safira WAMGIA]
+  SAFIRA[Safira WAMGIA]
 
-  subgraph Core e Inteligência
-    A --> CORE["Safira-Core (n8n)"]
-    CORE --> VENOM["Venom (WhatsApp)"]
-    CORE --> SESANE["SESANE (emoção por voz)"]
-  end
+  %% Core
+  SAFIRA --> CORE[Safira-Core (n8n)]
 
-  subgraph Voz & Imagem
-    CORE --> WHISPER["Whisper (STT)"]
-    CORE --> COQUI["Coqui (TTS)"]
-    WHISPER --> OLLAMA["Ollama (LLM)"]
-    COQUI --> BLIP2["BLIP2 (imagem input)"]
-    OLLAMA --> SD["Stable Diffusion"]
-  end
+  %% Inteligência
+  CORE --> VENOM[WhatsApp (Venom)]
+  CORE --> OLLAMA[LLM Ollama]
+  CORE --> SESANE[SESANE (emoção por voz)]
 
-  subgraph Observabilidade
-    OLLAMA --> PROMETHEUS["Prometheus"]
-    PROMETHEUS --> GRAFANA["Grafana"]
-  end
+  %% Áudio
+  CORE --> WHISPER[Whisper (STT)]
+  CORE --> COQUI[Coqui (TTS)]
+  WHISPER --> OLLAMA
+  COQUI --> OLLAMA
+  SESANE --> WHISPER
+  SESANE --> COQUI
 
-  subgraph Infraestrutura
-    CORE --> TRAEFIK["Traefik"]
-    TRAEFIK --> NGINX["NGINX"]
-    CORE --> REDIS["Redis"]
-    CORE --> MINIO["MinIO"]
-    CORE --> POSTGRES["PostgreSQL"]
-  end
+  %% Imagem
+  CORE --> BLIP2[BLIP2 (Leitor de Imagem)]
+  CORE --> SD[Stable Diffusion (T2I)]
+  BLIP2 --> OLLAMA
+  OLLAMA --> SD
+
+  %% Admin & CI
+  CORE --> JIRA[Jira (Tarefas)]
+  CORE --> JENKINS[Jenkins (CI/CD)]
+
+  %% Observabilidade
+  CORE --> PROMETHEUS[Prometheus (Métricas)]
+  PROMETHEUS --> GRAFANA[Grafana (Dashboards)]
+
+  %% Infra
+  CORE --> TRAEFIK[Traefik (Gateway)]
+  TRAEFIK --> NGINX[NGINX (Estático)]
+  CORE --> REDIS[Redis (Cache)]
+  CORE --> MINIO[MinIO (S3 Local)]
+  CORE --> POSTGRES[PostgreSQL (Banco de Dados)]
+
+  %% Interligações importantes
+  VENOM --> REDIS
+  VENOM --> POSTGRES
+  JIRA --> POSTGRES
+  GRAFANA --> PROMETHEUS
+  PROMETHEUS --> REDIS
+  JENKINS --> POSTGRES
+
 ```
 
 ---
