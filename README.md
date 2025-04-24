@@ -60,53 +60,80 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 
 
 ```mermaid
+%%{ init : {
+  "theme": "default",
+  "themeVariables": {
+    "primaryColor": "#e0f7fa",
+    "edgeLabelBackground":"#ffffff",
+    "tertiaryColor": "#fce4ec"
+  },
+  "flowchart": { "nodeSpacing": 40, "rankSpacing": 25 },
+  "securityLevel": "loose"
+}}%%
+
 graph TD
-  SAFIRA[Safira WAMGIA]
+  classDef core fill:#D0E6FF,stroke:#0066CC,stroke-width:2px,color:#003366;
+  classDef voice fill:#FFF3E0,stroke:#FF9800,stroke-width:2px,color:#E65100;
+  classDef img fill:#E1F5FE,stroke:#0288D1,stroke-width:2px,color:#01579B;
+  classDef infra fill:#E8F5E9,stroke:#388E3C,stroke-width:2px,color:#1B5E20;
+  classDef admin fill:#F3E5F5,stroke:#8E24AA,stroke-width:2px,color:#4A148C;
+  classDef db fill:#FBE9E7,stroke:#D84315,stroke-width:2px,color:#BF360C;
 
-  %% Core
-  SAFIRA --> CORE[Safira-Core (n8n)]
+graph TD
+  SAFIRA((Safira WAMGIA))
 
-  %% Inteligência
-  CORE --> VENOM[WhatsApp (Venom)]
-  CORE --> OLLAMA[LLM Ollama]
-  CORE --> SESANE[SESANE (emoção por voz)]
+  subgraph 🧠 Core & Inteligência
+    CORE[["Safira-Core (n8n)"]]:::core
+    VENOM["Venom\n(WhatsApp)"]:::core
+    SESANE["SESANE\n(emoção por voz)"]:::core
+    CORE --> VENOM
+    CORE --> SESANE
+  end
 
-  %% Áudio
-  CORE --> WHISPER[Whisper (STT)]
-  CORE --> COQUI[Coqui (TTS)]
-  WHISPER --> OLLAMA
-  COQUI --> OLLAMA
-  SESANE --> WHISPER
-  SESANE --> COQUI
+  subgraph 🔊 Voz & Imagem
+    WHISPER["((Whisper))\nSTT"]:::voice
+    COQUI["((Coqui))\nTTS"]:::voice
+    BLIP2["[[BLIP2]]\nLeitor de Imagem"]:::img
+    SD["[[Stable Diffusion]]"]:::img
+    OLLAMA["Ollama\n(LLM)"]:::core
 
-  %% Imagem
-  CORE --> BLIP2[BLIP2 (Leitor de Imagem)]
-  CORE --> SD[Stable Diffusion (T2I)]
-  BLIP2 --> OLLAMA
-  OLLAMA --> SD
+    CORE --> WHISPER
+    CORE --> COQUI
+    WHISPER --> OLLAMA
+    COQUI --> OLLAMA
+    BLIP2 --> OLLAMA
+    OLLAMA --> SD
+  end
 
-  %% Admin & CI
-  CORE --> JIRA[Jira (Tarefas)]
-  CORE --> JENKINS[Jenkins (CI/CD)]
+  subgraph 🛠️ Admin & Observabilidade
+    PROMETHEUS{"Prometheus"}:::admin
+    GRAFANA{{Grafana}}:::admin
+    JIRA["Jira\n(Tarefas)"]:::admin
+    JENKINS["Jenkins\n(CI/CD)"]:::admin
+    PROMETHEUS --> GRAFANA
+    CORE --> PROMETHEUS
+    CORE --> JIRA
+    CORE --> JENKINS
+  end
 
-  %% Observabilidade
-  CORE --> PROMETHEUS[Prometheus (Métricas)]
-  PROMETHEUS --> GRAFANA[Grafana (Dashboards)]
+  subgraph 🧱 Infraestrutura
+    TRAEFIK(["Traefik\nReverse Proxy"]):::infra
+    NGINX(["NGINX\nStatic Server"]):::infra
+    REDIS(["Redis"]):::infra
+    MINIO(["MinIO\nObject Storage"]):::infra
+    POSTGRES(["PostgreSQL"]):::db
+    CORE --> TRAEFIK
+    TRAEFIK --> NGINX
+    CORE --> REDIS
+    CORE --> MINIO
+    CORE --> POSTGRES
+    VENOM --> REDIS
+    VENOM --> POSTGRES
+    JIRA --> POSTGRES
+    JENKINS --> POSTGRES
+  end
 
-  %% Infra
-  CORE --> TRAEFIK[Traefik (Gateway)]
-  TRAEFIK --> NGINX[NGINX (Estático)]
-  CORE --> REDIS[Redis (Cache)]
-  CORE --> MINIO[MinIO (S3 Local)]
-  CORE --> POSTGRES[PostgreSQL (Banco de Dados)]
-
-  %% Interligações importantes
-  VENOM --> REDIS
-  VENOM --> POSTGRES
-  JIRA --> POSTGRES
-  GRAFANA --> PROMETHEUS
-  PROMETHEUS --> REDIS
-  JENKINS --> POSTGRES
+  SAFIRA --> CORE
 
 ```
 
