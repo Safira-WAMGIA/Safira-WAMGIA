@@ -23,9 +23,6 @@
 - Retorna uma resposta inteligente em **texto**, **áudio** ou **imagem**
 - Aprende com as interações e pode manter contexto, histórico e preferências do usuário
 
-### 🎯 Objetivo
-A Safira nasceu com a missão de tornar o poder da automação e IA acessível a qualquer pessoa, **sem depender de nuvem**, **sem perder privacidade** e **sem mensalidades abusivas**. É um sistema local, privado, potente e escalável. Cada instalação é como ter uma equipe de especialistas à disposição 24h, mas operando diretamente do seu computador pessoal.
-
 ### 🧩 Exemplo prático de uso
 Veja como a Safira pode atuar em diferentes contextos do dia a dia, de forma inteligente, sensível ao contexto e com respostas naturais:
 
@@ -61,7 +58,7 @@ A experiência de usar a Safira é como conversar com alguém que te conhece pro
 A Safira será oferecida em dois modelos principais:
 - **Gratuito**: acesso básico à assistente, sem agentes especializados e com limitações de uso
 - **Premium R$ 20/mês**: acesso completo, com direito a acesso agentes personalizados pagos e gratuitos.
-- **Agentes adicionais**: planos individuais de R$9,90 a R$40, conforme a complexidade e função do agente (Médico, Agente de Midias Sociais, SAgente Financeiro e etc.))
+- **Agentes adicionais**: planos individuais de R$9,90 a R$40, conforme a complexidade e função do agente (Médico, Agente de Midias Sociais, Agente Financeiro, Nutricionista,  e etc.))
 
 ---
 
@@ -196,29 +193,29 @@ A estrutura de diretórios da Safira é organizada de forma modular e autogerada
 ```bash
 safira-wamgia/
 ├── build/                    # Diretório base para todos os serviços customizados
-│   ├── venom/                # Serviço WhatsApp (venom-bot + main.js + Dockerfile)
-│   ├── ollama/               # LLM local (base: ollama)
-│   ├── sesame/               # Agente SESANE
-│   ├── whisper/              # STT via Faster-Whisper
-│   ├── coqui/                # TTS via Coqui TTS + Flask
-│   ├── blip2/                # Leitor de imagens com BLIP2
-│   ├── auto1111/             # Geração de imagem (Stable Diffusion)
-│   ├── jira/                 # Gestão de tarefas (base: Jira)
-│   ├── jenkins/              # Automação CI/CD (Jenkins)
-│   ├── prometheus/ grafana/  # Monitoramento
-│   ├── traefik/ 
-│   ├── nginxs/ 
-│   ├── redis/ 
-│   ├── minio/ 
-│   ├── postgres/
-├── db/                       # Dados persistentes ou iniciais de banco (se usado)
-├── docs/                     # Documentação do projeto (ex: MkDocs)
-├── workflows/                # Fluxos, modelos e templates de fluxos de trabalho do n8n padrão.
-├── scripts/                  # Scripts utilitários: secrets.sh, release.sh, etc.
-├── .env                      # Arquivo de variáveis de ambiente (gerado via run.sh)
-├── .env.example              # Template base do .env
-├── docker-compose.yml        # Orquestrador principal
-├── run.sh                    # Script principal: cria tudo e sobe stack
+│   ├── venom/                # Serviço WhatsApp (venom-bot + main.js + Dockerfile personalizado)
+│   ├── ollama/               # LLM local para processamento de linguagem (base: Ollama)
+│   ├── sesame/               # Agente emocional SESANE (interpretação e resposta afetiva)
+│   ├── whisper/              # STT (Speech-to-Text) com Faster-Whisper
+│   ├── coqui/                # TTS (Text-to-Speech) com Coqui TTS + API Flask
+│   ├── blip2/                # Leitor e interpretador de imagens (modelo BLIP2)
+│   ├── auto1111/             # Geração de imagens com Stable Diffusion + UI Auto1111
+│   ├── jira/                 # Integração com Jira para gestão de tarefas e automações
+│   ├── jenkins/              # Jenkins para pipeline CI/CD local e integração contínua
+│   ├── prometheus/ grafana/  # Monitoramento e visualização de métricas
+│   ├── traefik/              # Load balancer e proxy reverso para os serviços internos
+│   ├── nginxs/               # Servidor web e/ou proxy para rotas específicas estáticas
+│   ├── redis/                # Banco de dados em memória (mensageria, cache, filas)
+│   ├── minio/                # Armazenamento local compatível com S3 (utilizado por IA, logs, etc.)
+│   ├── postgres/             # Banco de dados relacional PostgreSQL (n8n, sessões, histórico)
+├── db/                       # Dados persistentes ou seeds iniciais de banco (ex: usuários, configs)
+├── docs/                     # Documentação do projeto (ex: MkDocs, Swagger, etc.)
+├── workflows/                # Fluxos n8n reutilizáveis, templates, modelos e integrações
+├── scripts/                  # Scripts utilitários para setup, secrets, release e debugging
+├── .env                      # Arquivo de variáveis de ambiente (auto-gerado pelo run.sh)
+├── .env.example              # Modelo base para configuração do ambiente local
+├── docker-compose.yml        # Orquestrador principal da stack com todos os containers
+├── run.sh                    # Script principal que inicializa, configura e sobe toda a stack
 ```
 
 ### 🧠 Observações
@@ -269,7 +266,8 @@ Você pode usar o `run.sh` com parâmetros adicionais:
 | `./run.sh --only-ai` | Sobe somente os modelos IA (Whisper, Coqui etc) |
 
 > 🧠 O `run.sh` é seguro, modular e inteligente: roda só o necessário, e nunca executa builds ou resets desnecessários sem confirmação.
-bash
+
+```bash
 git clone https://github.com/caioross/Safira-WAMGIA.git
 cd safira-wamgia
 chmod +x setup.sh run.sh secrets.sh
