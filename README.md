@@ -62,45 +62,45 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 ```mermaid
 
 graph TD
-  VENOM[WhatsApp (Venom)]
-  VENOM --> CORE[n8n (Orquestrador)]
+  VENOM["WhatsApp (Venom)"]
+  VENOM --> CORE["n8n (Orquestrador)"]
 
   subgraph Processamento_Voz
-    CORE --> WHISPER[Whisper (STT)]
-    WHISPER --> SESANE[SESANE (Emoção)]
-    SESANE --> OLLAMA[LLM Ollama]
-    OLLAMA --> COQUI[Coqui (TTS)]
+    CORE --> WHISPER["Whisper (STT)"]
+    WHISPER --> SESANE["SESANE (Emocao)"]
+    SESANE --> OLLAMA["Ollama (LLM)"]
+    OLLAMA --> COQUI["Coqui (TTS)"]
   end
 
   subgraph Processamento_Imagem
-    CORE --> BLIP2[BLIP2 (Leitor Imagem)]
+    CORE --> BLIP2["BLIP2 (Leitor de Imagem)"]
     BLIP2 --> OLLAMA
-    OLLAMA --> SD[Stable Diffusion]
+    OLLAMA --> SD["Stable Diffusion"]
   end
 
-  subgraph Persistência
-    CORE --> POSTGRES[(PostgreSQL)]
-    CORE --> REDIS[(Redis)]
-    CORE --> MINIO[(MinIO)]
-    VENOM --> POSTGRES
+  subgraph Persistencia
+    CORE --> POSTGRES["PostgreSQL"]
+    CORE --> REDIS["Redis"]
+    CORE --> MINIO["MinIO"]
     VENOM --> REDIS
+    VENOM --> POSTGRES
     JIRA --> POSTGRES
     JENKINS --> POSTGRES
   end
 
   subgraph Observabilidade
-    CORE --> PROMETHEUS
-    PROMETHEUS --> GRAFANA
+    CORE --> PROMETHEUS["Prometheus"]
+    PROMETHEUS --> GRAFANA["Grafana"]
   end
 
-  subgraph Administração
-    CORE --> JIRA
-    CORE --> JENKINS
+  subgraph Administracao
+    CORE --> JIRA["Jira"]
+    CORE --> JENKINS["Jenkins"]
   end
 
-  subgraph Infra
-    CORE --> TRAEFIK
-    TRAEFIK --> NGINX
+  subgraph Infraestrutura
+    CORE --> TRAEFIK["Traefik"]
+    TRAEFIK --> NGINX["NGINX"]
   end
 
 
