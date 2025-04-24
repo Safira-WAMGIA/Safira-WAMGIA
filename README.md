@@ -74,7 +74,7 @@ graph TD
     BLIP2 --> OLLAMA_3["Ollama"]
   end
 
-  subgraph Processo Decisório (n8n)
+  subgraph Processo Decisório
     OLLAMA_1 --> CORE
     OLLAMA_2 --> CORE
     OLLAMA_3 --> CORE
