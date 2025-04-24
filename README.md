@@ -11,16 +11,6 @@
 ![n8n](https://img.shields.io/badge/n8n-Core-E85255?logo=n8n&logoColor=white&style=flat-square)
 ![WhatsApp](https://img.shields.io/badge/WhatsApp-Venom‑bot-25D366?logo=whatsapp&logoColor=white&style=flat-square)
 
-
-# 🔷 Safira WAMGIA – README 2025
-
-![Versão](https://img.shields.io/badge/Vers%C3%A3o-2025.04%E2%80%91rev%E2%80%91stable-blue?style=flat-square)
-![Licença](https://img.shields.io/badge/Licen%C3%A7a-Particular-red?style=flat-square)
-![Ambiente](https://img.shields.io/badge/Ambiente-Docker%20Compose-blueviolet?style=flat-square)
-![Infra](https://img.shields.io/badge/Infraestrutura-Microsservi%C3%A7os-orange?style=flat-square)
-
----
-
 ## 🧠 Visão Geral
 
 **Safira WAMGIA** é uma assistente pessoal multimodal, executada localmente, com foco em privacidade, automação inteligente e interações emocionais através de voz, texto e imagem. Baseada em **n8n**, **LLMs**, **STT/TTS**, e um conjunto de agentes específicos, a Safira permite workflows personalizados e expansão modular.
@@ -67,6 +57,39 @@ A Safira opera via **Docker Compose**, utilizando 17 containers principais, sepa
 |--------------------|------------------------------------------|------|
 | BLIP2              | Leitura e compreensão de imagens          | imagem, input |
 | Stable Diffusion   | Geração de imagens via texto (T2I)       | imagem, output |
+
+
+```mermaid
+graph TD
+  A[Safira WAMGIA]
+
+  subgraph Core e Inteligência
+    A --> CORE["Safira-Core (n8n)"]
+    CORE --> VENOM["Venom (WhatsApp)"]
+    CORE --> SESANE["SESANE (emoção por voz)"]
+  end
+
+  subgraph Voz & Imagem
+    CORE --> WHISPER["Whisper (STT)"]
+    CORE --> COQUI["Coqui (TTS)"]
+    WHISPER --> OLLAMA["Ollama (LLM)"]
+    COQUI --> BLIP2["BLIP2 (imagem input)"]
+    OLLAMA --> SD["Stable Diffusion"]
+  end
+
+  subgraph Observabilidade
+    OLLAMA --> PROMETHEUS["Prometheus"]
+    PROMETHEUS --> GRAFANA["Grafana"]
+  end
+
+  subgraph Infraestrutura
+    CORE --> TRAEFIK["Traefik"]
+    TRAEFIK --> NGINX["NGINX"]
+    CORE --> REDIS["Redis"]
+    CORE --> MINIO["MinIO"]
+    CORE --> POSTGRES["PostgreSQL"]
+  end
+```
 
 ---
 
@@ -238,34 +261,22 @@ O módulo de observabilidade da Safira garante rastreamento completo da saúde d
 
 > O painel default do Grafana está disponível em `http://localhost:3000` com credenciais configuradas via `secrets.sh`
 
-### 🪵 Logs Centralizados
-- **Loki** (opcional): agrega e estrutura logs de todos os containers para análise via Grafana (modo Explore).
-- Logs podem ser filtrados por nível (`info`, `warning`, `error`) e por serviço, útil para depuração e auditoria de fluxos.
-
-### 🔔 Alertas e Notificações (planejado)
-- Integração futura com **Alertmanager** para notificar incidentes via e-mail, Telegram, Discord ou WhatsApp.
-
 ---
 
 ## 🔍 Roadmap
 
-### ✅ Concluídos
-- [x] Integração com WhatsApp via Venom
-- [x] Pipeline de CI/CD local com GitHub Actions + scripts
-- [x] Conversão de voz para texto (Whisper) e TTS (Coqui)
-- [x] Geração e leitura de imagens com IA (Stable Diffusion + BLIP2)
-- [x] Análise emocional com SESANE
-- [x] Dashboard de métricas com Grafana + Prometheus
-- [x] Secrets automatizados via `secrets.sh`
-- [x] Setup completo com `run.sh`, `setup.sh`, `secrets.sh`
-
-### 🧪 Em Execução / Testes
+- [ ] Integração com WhatsApp via Venom
+- [ ] Pipeline de CI/CD local com GitHub Actions + scripts
+- [ ] Conversão de voz para texto (Whisper) e TTS (Coqui)
+- [ ] Geração e leitura de imagens com IA (Stable Diffusion + BLIP2)
+- [ ] Análise emocional com SESANE
+- [ ] Dashboard de métricas com Grafana + Prometheus
+- [ ] Secrets automatizados via `secrets.sh`
+- [ ] Setup completo com `run.sh`, `setup.sh`, `secrets.sh`
 - [ ] Testes unitários automatizados por serviço (pytest, ruff)
 - [ ] Testes de stress e carga em Ollama e Whisper
 - [ ] Teste de fallback de LLM secundária (ex: GPT4All)
 - [ ] Modo "dev" com auto-reload + debug isolado
-
-### 🧩 A Fazer
 - [ ] Caching inteligente com Redis para consultas repetidas
 - [ ] Orquestração interna de agentes (modo LangChain-like)
 - [ ] Documentação de uso para colaborador/analista
