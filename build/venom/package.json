@@ -1,0 +1,9 @@
+{
+  "name": "safira-whatsapp",
+  "version": "1.0.0",
+  "main": "main.js",
+  "type": "module",
+  "dependencies": {
+    "venom-bot": "^5.1.0"
+  }
+}

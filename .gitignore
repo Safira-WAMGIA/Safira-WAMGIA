@@ -58,7 +58,6 @@ file-manager/uploads/
 # Node.js e outras linguagens (caso use no front ou scripts)
 node_modules/
 dist/
-build/
 .vscode/
 .idea/
 *.swp
