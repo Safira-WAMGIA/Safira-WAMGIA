@@ -321,6 +321,8 @@ RUN apt-get update && apt-get install -y \
     git ffmpeg libglib2.0-0 libsm6 libxext6 libxrender-dev \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir open3d==0.13.0
 RUN pip install --no-cache-dir \
     torch torchvision torchaudio \
     flask pillow
