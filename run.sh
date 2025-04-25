@@ -118,6 +118,9 @@ echo_info "Verificando arquivos base para o serviço Venom..."
 VENOM_PATH=./build/venom
 
 # Criar package.json se não existir
+
+# n8n
+
 if [ ! -f "$VENOM_PATH/package.json" ]; then
   cat <<EOF > "$VENOM_PATH/package.json"
 {
@@ -163,7 +166,9 @@ EOF
   echo_info "📦 Dockerfile criado para o serviço Venom"
 fi
 echo_info "🧪 Validando presença do Dockerfile do Venom: $(ls -la ./build/venom/Dockerfile)"
+
 # Coqui
+
 echo_info "Verificando arquivos base para o serviço Coqui..."
 COQUI_PATH=./build/coqui
 if [ ! -f "$COQUI_PATH/main.py" ]; then
@@ -195,9 +200,13 @@ fi
 if [ ! -f "$COQUI_PATH/Dockerfile" ]; then
   cat <<EOF > "$COQUI_PATH/Dockerfile"
 FROM python:3.10-slim
+RUN apt-get update && apt-get install -y \
+    ffmpeg libsndfile1 git \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+RUN pip install --no-cache-dir \
+    TTS==0.22.0 flask
 COPY main.py .
-RUN pip install --no-cache-dir TTS flask
 EXPOSE 9001
 CMD ["python", "main.py"]
 EOF
@@ -308,14 +317,16 @@ fi
 if [ ! -f "$BLIP2_PATH/Dockerfile" ]; then
   cat <<EOF > "$BLIP2_PATH/Dockerfile"
 FROM python:3.9-slim
+RUN apt-get update && apt-get install -y \
+    git ffmpeg libglib2.0-0 libsm6 libxext6 libxrender-dev \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+RUN pip install --no-cache-dir \
+    torch torchvision torchaudio \
+    flask pillow
+RUN pip install --no-cache-dir git+https://github.com/salesforce/LAVIS.git
 COPY main.py .
-RUN apt-get update \
- && apt-get install -y ffmpeg git \
- && rm -rf /var/lib/apt/lists/* \
- && pip install --no-cache-dir torch pillow flask faster-whisper \
- && pip install --no-cache-dir git+https://github.com/salesforce/LAVIS.git
-EXPOSE 9000
+EXPOSE 9003
 CMD ["python", "main.py"]
 EOF
   echo_info "📦 Dockerfile criado para o serviço BLIP2"
