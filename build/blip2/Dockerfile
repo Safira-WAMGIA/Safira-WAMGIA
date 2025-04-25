@@ -1,6 +1,15 @@
-FROM python:3.10-slim
+FROM python:3.9-slim
+
 WORKDIR /app
+
 COPY main.py .
-RUN pip install --no-cache-dir torch lavis pillow flask
-EXPOSE 9003
+
+RUN apt-get update \
+ && apt-get install -y ffmpeg git \
+ && rm -rf /var/lib/apt/lists/* \
+ && pip install --no-cache-dir torch pillow flask faster-whisper \
+ && pip install --no-cache-dir git+https://github.com/salesforce/LAVIS.git
+
+EXPOSE 9000
+
 CMD ["python", "main.py"]
