@@ -162,7 +162,7 @@ CMD ["node", "main.js"]
 EOF
   echo_info "📦 Dockerfile criado para o serviço Venom"
 fi
-
+echo_info "🧪 Validando presença do Dockerfile do Venom: $(ls -la ./build/venom/Dockerfile)"
 # Coqui
 echo_info "Verificando arquivos base para o serviço Coqui..."
 COQUI_PATH=./build/coqui
@@ -241,12 +241,21 @@ fi
 if [ ! -f "$WHISPER_PATH/Dockerfile" ]; then
   cat <<EOF > "$WHISPER_PATH/Dockerfile"
 FROM python:3.10-slim
+
 WORKDIR /app
+
 COPY main.py .
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/* \
-    && pip install --no-cache-dir faster-whisper flask
+
+RUN apt-get update \
+ && apt-get install -y ffmpeg git \
+ && rm -rf /var/lib/apt/lists/* \
+ && pip install --no-cache-dir faster-whisper flask \
+ && pip install --no-cache-dir git+https://github.com/salesforce/LAVIS.git
+
 EXPOSE 9000
+
 CMD ["python", "main.py"]
+
 EOF
   echo_info "📦 Dockerfile criado para o serviço Whisper"
 fi

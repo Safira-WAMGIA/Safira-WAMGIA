@@ -183,7 +183,7 @@ services:
     restart: unless-stopped
 
   stable-diffusion:
-    build: ./build/auto1111/stable-diffusion-webui-docker
+    image: nicklucche/stable-diffusion
     ports: ["7860:7860"]
     networks: [safira-net]
     volumes:
