@@ -11,7 +11,15 @@ if (!WEBHOOK_URL) {
   process.exit(1);
 }
 
-create().then((client) => {
+create({
+  session: 'safira-session',
+  multidevice: true,
+  disableWelcome: true,
+  headless: true, // 👈 importante!
+  browserArgs: ['--no-sandbox'],
+  folderNameToken: 'tokens',   // onde armazenar tokens
+  mkdirFolderToken: './tokens' // cria localmente
+}).then((client) => {
   client.onMessage(async (message) => {
     console.log('📩 Mensagem recebida:', message);
 
