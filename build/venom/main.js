@@ -7,15 +7,8 @@ import path from 'path';
 
 dotenv.config();
 
-/*****************************************************************************************
- * Safira – Venom → n8n bridge
- * ---------------------------------------------------------------------------------------
- * • Escuta mensagens do WhatsApp (texto, imagem, áudio, vídeo, docs).
- * • Faz POST para WEBHOOK_URL (n8n) enviando metadados + mídia (BASE64) quando existir.
- * • Mantém um endpoint de saúde simples em /status.
- *****************************************************************************************/
-
 const WEBHOOK_URL = process.env.WEBHOOK_URL?.trim();
+const PORT = process.env.PORT || 3000;
 
 if (!WEBHOOK_URL) {
   console.error('❌ Variável de ambiente WEBHOOK_URL não definida!');
@@ -38,7 +31,6 @@ create({
   disableWelcome: true,
   headless: true,
   browserArgs: ['--no-sandbox'],
-  folderNameToken: 'tokens',
   mkdirFolderToken: './tokens'
 }).then((client) => {
   console.log('🤖 Venom inicializado, aguardando mensagens…');

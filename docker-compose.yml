@@ -47,6 +47,8 @@ services:
     volumes:
       - venom-data:/app/sessions
     env_file: .env
+    environment:
+      - WEBHOOK_URL=${WEBHOOK_URL}
     restart: unless-stopped
 
   llm-ollama:
