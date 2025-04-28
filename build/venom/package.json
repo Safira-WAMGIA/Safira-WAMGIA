@@ -4,8 +4,7 @@
   "main": "main.js",
   "type": "module",
   "dependencies": {
-    "venom-bot": "^5.1.0",
-    "axios": "^1.6.8",
-    "dotenv": "^16.3.1"
+    "express": "^5.1.0",
+    "venom-bot": "^5.1.0"
   }
 }
