@@ -1,43 +1,42 @@
-import os, subprocess, wave, json, uuid, tempfile
-from flask import Flask, request, jsonify
-import stt                       # Coqui-STT engine
+import io, os
+import soundfile as sf
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from TTS.api import TTS
 
-MODEL_PATH  = os.getenv("STT_MODEL",  "/models/model.tflite")
-SCORER_PATH = os.getenv("STT_SCORER", "/models/model.scorer")
+# Carrega o modelo uma única vez
+MODEL_NAME = os.getenv("TTS_MODEL_NAME", "tts_models/pt/cv/vits")
+tts = TTS(model_name=MODEL_NAME, progress_bar=False, gpu=False)
 
-model  = stt.Model(MODEL_PATH)
-model.enableExternalScorer(SCORER_PATH)
+app = FastAPI(title="Safira – Coqui TTS", version="1.0")
 
-app = Flask(__name__)
+class TTSRequest(BaseModel):
+    text: str
 
-@app.route("/healthz")
-def healthz():
-    return "ok", 200
+@app.post("/tts", summary="Texto → áudio (wav)")
+async def tts_endpoint(req: TTSRequest):
+    txt = req.text.strip()
+    if not txt:
+        raise HTTPException(400, "Campo 'text' vazio.")
+    # Sintetiza
+    wav = tts.tts(txt)
+    buf = io.BytesIO()
+    sf.write(buf, wav, tts.synthesizer.output_sample_rate, format="WAV")
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="audio/wav")
 
-@app.route("/transcribe", methods=["POST"])
-def transcribe():
-    if "audio" not in request.files:
-        return jsonify(error="file field 'audio' missing"), 400
-
-    # salva áudio temporário
-    raw = tempfile.NamedTemporaryFile(suffix=".bin", delete=False)
-    request.files["audio"].save(raw.name)
-
-    # converte p/ wav 16 kHz mono
-    wav_path = f"/tmp/{uuid.uuid4()}.wav"
-    cmd = ["ffmpeg", "-y", "-i", raw.name, "-ac", "1", "-ar", "16000", wav_path]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    # lê bytes e transcreve
-    with wave.open(wav_path, "rb") as w:
-        audio = w.readframes(w.getnframes())
-    text = model.stt(audio)
-
-    # limpa
-    os.remove(raw.name)
-    os.remove(wav_path)
-
-    return jsonify(text=text)
+# Ping healthcheck opcional
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9002)
+    import uvicorn
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 5000)),
+        proxy_headers=True,
+    )
+

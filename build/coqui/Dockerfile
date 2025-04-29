@@ -1,22 +1,18 @@
-FROM python:3.12-slim
+FROM ghcr.io/coqui-ai/tts-cpu:latest 
 
-# —— dependências do sistema ——
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg sox && \
-    rm -rf /var/lib/apt/lists/*
-
-# —— prepara ambiente —— 
 WORKDIR /app
+
+# 1. dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# —— copia fonte —— 
+# 2. application code
 COPY main.py .
 
-# —— porta HTTP —— 
-EXPOSE 9002
+# 3. ambiente e exposição
+ENV MODEL_NAME=tts_models/pt/cv/vits \
+    PORT=5000 \
+    USE_CUDA=false
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -f http://localhost:9002/healthz || exit 1
-
-CMD ["python", "main.py"]
+EXPOSE 5000
+ENTRYPOINT ["python", "main.py"]

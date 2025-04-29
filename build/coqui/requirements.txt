@@ -1,5 +1,4 @@
-flask==3.0.*
-gunicorn==22.0.*
-stt==1.5.0 
-numpy==1.26.*
-soundfile==0.12.*
+TTS==0.22.0
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+soundfile==0.12.1

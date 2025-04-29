@@ -1,5 +1,3 @@
-version: '3.9'
-
 networks:
   safira-net:
     name: safira-net
@@ -9,20 +7,9 @@ volumes:
   n8n-data:
   venom-data:
   ollama-data:
-  sesame-config:
   whisper-models:
-  coqui-models:
-  prometheus-data:
-  grafana-data:
-  traefik-data:
-  nginx-data:
-  redis-data:
-  minio-data:
-  jira-data:
-  jenkins-data:
-  blip2-data:
-  sd-data:
   pgdata:
+  tts-cache:
 
 services:
   safira-core:
@@ -60,18 +47,6 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  sesane:
-    build: ./build/sesame
-    ports: ["8003:8003"]
-    networks: [safira-net]
-    volumes:
-      - sesame-config:/app/config
-    env_file: .env
-    depends_on:
-      - safira-core
-      - llm-ollama
-    restart: unless-stopped
-
   whisper:
     build: ./build/whisper
     image: safira-whisper:latest
@@ -90,118 +65,18 @@ services:
       - llm-ollama
     restart: unless-stopped
 
-  coqui:
+  tts:
     build: ./build/coqui
     image: safira-coqui:latest
     ports: ["9001:9001"]
     networks: [safira-net]
     volumes:
-      - ./models/stt:/models
+      - tts-cache:/root/.local/share/tts
     env_file: .env
     environment:
-      STT_MODEL:  /models/model.tflite
-      STT_SCORER: /models/model.scorer
-    depends_on:
-      - safira-core
-      - llm-ollama
+      MODEL_NAME: tts_models/multilingual/multi-dataset/xtts_v2
+      USE_CUDA: "false"
     restart: unless-stopped
-
-  prometheus:
-    image: prom/prometheus
-    ports: ["9090:9090"]
-    networks: [safira-net]
-    volumes:
-      - prometheus-data:/prometheus
-    env_file: .env
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana
-    ports: ["3001:3001"]
-    networks: [safira-net]
-    volumes:
-      - grafana-data:/var/lib/grafana
-    env_file: .env
-    depends_on:
-      - prometheus
-    restart: unless-stopped
-
-  traefik:
-    image: traefik
-    ports: ["8080:8080"]
-    networks: [safira-net]
-    volumes:
-      - traefik-data:/etc/traefik
-    env_file: .env
-    restart: unless-stopped
-
-  nginxs:
-    image: nginx
-    ports: ["8081:8081"]
-    networks: [safira-net]
-    volumes:
-      - nginx-data:/usr/share/nginx/html
-    env_file: .env
-    restart: unless-stopped
-
-  redis:
-    image: redis
-    ports: ["6379:6379"]
-    networks: [safira-net]
-    volumes:
-      - redis-data:/data
-    env_file: .env
-    restart: unless-stopped
-
-  minio:
-    image: minio/minio
-    ports: ["9002:9000"]
-    networks: [safira-net]
-    volumes:
-      - minio-data:/data
-    env_file: .env
-    restart: unless-stopped
-
-  jira:
-    build: ./build/jira
-    ports: ["8082:8082"]
-    networks: [safira-net]
-    volumes:
-      - jira-data:/var/atlassian/jira
-    env_file: .env
-    depends_on:
-      - postgree
-    restart: unless-stopped
-
-  jenkins:
-    image: jenkins/jenkins:lts
-    ports: ["8083:8083"]
-    networks: [safira-net]
-    volumes:
-      - jenkins-data:/var/jenkins_home
-    env_file: .env
-    restart: unless-stopped
-
-  blip2:
-    build: ./build/blip2
-    ports: ["9003:9003"]
-    networks: [safira-net]
-    volumes:
-      - blip2-data:/app/models
-    env_file: .env
-    depends_on:
-      - safira-core
-      - llm-ollama
-    restart: unless-stopped
-
-  stable-diffusion:
-    image: nicklucche/stable-diffusion
-    ports: ["7860:7860"]
-    networks: [safira-net]
-    volumes:
-      - sd-data:/data
-    restart: unless-stopped
-
 
   postgree:
     image: postgres:16
