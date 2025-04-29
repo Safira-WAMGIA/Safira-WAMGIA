@@ -74,11 +74,17 @@ services:
 
   whisper:
     build: ./build/whisper
+    image: safira-whisper:latest
     ports: ["9000:9000"]
     networks: [safira-net]
     volumes:
       - whisper-models:/models
     env_file: .env
+    environment:
+      WHISPER_MODEL: large-v3
+      WHISPER_LANGUAGE: pt
+      WHISPER_DEVICE: cpu
+      WHISPER_COMPUTE_TYPE: int8
     depends_on:
       - safira-core
       - llm-ollama
@@ -86,11 +92,15 @@ services:
 
   coqui:
     build: ./build/coqui
+    image: safira-coqui:latest
     ports: ["9001:9001"]
     networks: [safira-net]
     volumes:
-      - coqui-models:/models
+      - ./models/stt:/models
     env_file: .env
+    environment:
+      STT_MODEL:  /models/model.tflite
+      STT_SCORER: /models/model.scorer
     depends_on:
       - safira-core
       - llm-ollama

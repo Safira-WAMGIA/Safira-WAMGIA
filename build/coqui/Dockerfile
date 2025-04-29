@@ -1,15 +1,22 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y \
-    ffmpeg libsndfile1 git \
- && rm -rf /var/lib/apt/lists/*
+# —— dependências do sistema ——
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg sox && \
+    rm -rf /var/lib/apt/lists/*
 
+# —— prepara ambiente —— 
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir \
-    TTS==0.22.0 flask
-
+# —— copia fonte —— 
 COPY main.py .
 
-EXPOSE 9001
+# —— porta HTTP —— 
+EXPOSE 9002
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f http://localhost:9002/healthz || exit 1
+
 CMD ["python", "main.py"]
