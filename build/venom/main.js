@@ -27,8 +27,8 @@ dotenv.config();
  *****************************************************************************************/
 
 /* ---------- Config -------------------------------------------------------------- */
-const TEST_MODE = 'false';
-const OUT_WEBHOOK_URL = 'http://safira-core:5678/webhook/whatsapp-input';
+const TEST_MODE = 'true';
+const OUT_WEBHOOK_URL = 'http://safira-core:5678/webhook-test/whatsapp-input';
 const PORT = process.env.PORT || 3000;
 
 console.log(`↗️  Enviando entradas para ${OUT_WEBHOOK_URL}`);
