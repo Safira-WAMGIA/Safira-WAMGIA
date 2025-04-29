@@ -5,7 +5,6 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from TTS.api import TTS
 
-# Carrega o modelo uma única vez
 MODEL_NAME = os.getenv("TTS_MODEL_NAME", "tts_models/pt/cv/vits")
 tts = TTS(model_name=MODEL_NAME, progress_bar=False, gpu=False)
 
@@ -35,7 +34,6 @@ async def tts_endpoint(req: TTSRequest):
     buf.seek(0)
     return StreamingResponse(buf, media_type="audio/wav")
 
-# Ping healthcheck opcional
 @app.get("/health")
 async def health():
     return {"status": "ok"}

@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
-###############################################################################
-# run.sh – Safira minimal stack
-# Nunca fecha o terminal; logs sem “false”
-###############################################################################
 set -Eeuo pipefail
 
-# ─── cores e log ───────────────────────────────────────────────────────────
 BOLD="\e[1m"; DIM="\e[2m"; RESET="\e[0m"
 RED="\e[31m"; GRN="\e[32m"; YLW="\e[33m"; CYN="\e[36m"
 log() {
   local lvl="$1"; shift
-  # descarta acidental 'true/false' vindo de flags booleanas
   while [[ "$1" == "true" || "$1" == "false" ]]; do shift; done
   printf "%b[%-5s]%b %s\n" "$CYN" "$lvl" "$RESET" "$*"
 }
 
-# ─── garante shell aberto ─────────────────────────────────────────────────
 cleanup() {
   local code=$?
   [[ $code -ne 0 ]] && echo -e "\n${RED}❌ Script terminou com erro ($code).${RESET}"
@@ -24,7 +17,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# ─── variáveis & flags ────────────────────────────────────────────────────
 COMPOSE="docker-compose.yml"
 ENV_FILE=".env"; ENV_EX=".env.example"
 BUILD=false; UP_ONLY=false; RESET=false; STATUS=false; NONINT=false
@@ -37,20 +29,15 @@ for arg in "$@"; do case $arg in
   *) log WARN "Flag desconhecida: $arg";;
 esac; done
 
-# ─── fast paths ───────────────────────────────────────────────────────────
 $RESET  && { log INFO "Resetando stack"; docker compose -f "$COMPOSE" down -v --remove-orphans; exit; }
 $STATUS && { docker compose -f "$COMPOSE" ps; exit; }
 
-# ─── pré-requisitos ───────────────────────────────────────────────────────
 for cmd in docker "docker compose"; do command -v ${cmd%% *} >/dev/null || { echo -e "${RED}$cmd ausente${RESET}"; exit 1; }; done
 
-# ─── .env ─────────────────────────────────────────────────────────────────
 [[ -f $ENV_FILE ]] || { [[ -f $ENV_EX ]] && cp "$ENV_EX" "$ENV_FILE"; }
 
-# ─── valida YAML ─────────────────────────────────────────────────────────
 docker compose -f "$COMPOSE" config -q || { echo -e "${RED}YAML inválido${RESET}"; exit 1; }
 
-# ─── pull / build ---------------------------------------------------------
 if ! $UP_ONLY; then
   if $BUILD; then
     log INFO "Rebuild completo (--build)"
@@ -65,11 +52,9 @@ else
   log INFO "--up ativo: pulando pull/build"
 fi
 
-# ─── up -------------------------------------------------------------------
 log INFO "Subindo containers"
 docker compose -f "$COMPOSE" up -d --remove-orphans || true
 
-# ─── resumo ----------------------------------------------------------------
 echo -e "\n${BOLD}📊 RESUMO${RESET}"
 if ! docker compose -f "$COMPOSE" ps --format "table {{.Name}}\t{{.State}}\t{{.Ports}}" 2>/dev/null; then
   docker compose -f "$COMPOSE" ps
@@ -86,17 +71,14 @@ ${BOLD}🌐 ENDPOINTS${RESET}
   Ollama      → http://localhost:11434
 EOF
 
-# ─── fim (mantém shell) ----------------------------------------------------
-SUCCESS=1   # assume falha até provar sucesso
+SUCCESS=1
 
-# se todos containers obrigatórios estão "running" ou "started", zera a flag
 if docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | \
    grep -Eq 'whisper.*running|whisper.*started' && \
    grep -Eq 'tts.*running|tts.*started'; then
   SUCCESS=0
 fi
 
-# força exit 0 p/ não exibir erro se SUCCESS=0
 [[ $SUCCESS -eq 0 ]] && exit 0
 
 $NONINT && exit 0

@@ -7,26 +7,6 @@ import path from 'path';
 
 dotenv.config();
 
-/*****************************************************************************************
- * Safira – Venom bridge (v3)
- * ---------------------------------------------------------------------------------------
- * 1. Recebe mensagens do WhatsApp ⇒ POSTa no n8n (webhook ou webhook‑test)
- * 2. Recebe POST do n8n em /send ⇒ despacha para o WhatsApp (texto + mídia)
- *    → JSON esperado:
- *       {
- *         "to": "551199999999@c.us",      // obrigatório
- *         "type": "text" | "image" | "audio" | "video" | "file",
- *         "body": "mensagem opcional",
- *         "caption": "legenda opcional",
- *         "file": {                         // obrigatório quando não for text
- *           "filename": "foto.jpg",
- *           "mimetype": "image/jpeg",
- *           "data": "BASE64_STRING"        // sem header data:...;base64,
- *         }
- *       }
- *****************************************************************************************/
-
-/* ---------- Config -------------------------------------------------------------- */
 const TEST_MODE = 'true';
 const OUT_WEBHOOK_URL = 'http://safira-core:5678/webhook-test/whatsapp-input';
 const PORT = process.env.PORT || 3000;
@@ -34,16 +14,13 @@ const PORT = process.env.PORT || 3000;
 console.log(`↗️  Enviando entradas para ${OUT_WEBHOOK_URL}`);
 console.log(`🛂  Aguardando comandos POST em http://whatsapp:${PORT}/send`);
 
-/* ---------- Express ------------------------------------------------------------- */
 const app = express();
 app.use(express.json({ limit: '25mb' }));
 app.get('/status', (_, res) => res.json({ status: 'ok', testMode: TEST_MODE }));
 
-/* ---------- Pasta tmp ----------------------------------------------------------- */
 const TMP_DIR = path.resolve('./tmp');
 if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR);
 
-/* ---------- Venom init ---------------------------------------------------------- */
 let venomClient = null;
 create({
   session: 'safira-session',
@@ -57,7 +34,6 @@ create({
   venomClient = client;
   console.log('🤖 Venom pronto.');
 
-  /* IN → n8n ------------------------------------------------------------------- */
   client.onMessage(async (msg) => {
     try {
       const payload = {
@@ -88,7 +64,6 @@ create({
   process.exit(1);
 });
 
-/* ---------- OUT → WhatsApp ----------------------------------------------------- */
 app.post('/send', async (req, res) => {
   if (!venomClient) return res.status(503).json({ error: 'Venom não inicializado' });
 
@@ -113,7 +88,7 @@ app.post('/send', async (req, res) => {
         await venomClient.sendVideoAsGifFromBase64(to, file?.data, file?.filename || 'video.mp4', caption);
         break;
 
-      default: // generic file
+      default:
         await venomClient.sendFileFromBase64(to, file?.data, file?.filename || 'file.bin', caption);
     }
     res.json({ status: 'sent' });
