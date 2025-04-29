@@ -65,8 +65,8 @@ services:
     restart: unless-stopped
 
   tts:
-    build: ./build/coqui
-    ports: ["9001:9001"]
+    build: ./build/tts
+    ports: ["5000:5000"]
     networks: [safira-net]
     volumes:
       - tts-cache:/root/.local/share/tts
@@ -75,6 +75,9 @@ services:
       MODEL_NAME: tts_models/multilingual/multi-dataset/xtts_v2
       USE_CUDA: "false"
     restart: unless-stopped
+
+
+
 
   postgree:
     image: postgres:16
