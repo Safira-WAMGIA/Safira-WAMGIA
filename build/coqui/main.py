@@ -13,7 +13,16 @@ app = FastAPI(title="Safira – Coqui TTS", version="1.0")
 
 class TTSRequest(BaseModel):
     text: str
+    language_id: str = "pt"
+    speaker_wav: str | None = None
 
+@app.post("/tts")
+async def tts_endpoint(req: TTSRequest):
+    wav = tts.tts(
+        req.text,
+        speaker_wav=req.speaker_wav,
+        language=req.language_id
+    )
 @app.post("/tts", summary="Texto → áudio (wav)")
 async def tts_endpoint(req: TTSRequest):
     txt = req.text.strip()

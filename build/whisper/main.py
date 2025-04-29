@@ -18,19 +18,6 @@ app = Flask(__name__)
 def healthz():
     return "ok", 200
 
-class TTSRequest(BaseModel):
-    text: str
-    language_id: str = "pt"
-    speaker_wav: str | None = None
-
-@app.post("/tts")
-async def tts_endpoint(req: TTSRequest):
-    wav = tts.tts(
-        req.text,
-        speaker_wav=req.speaker_wav,
-        language=req.language_id
-    )
-
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
     if "file" not in request.files:
