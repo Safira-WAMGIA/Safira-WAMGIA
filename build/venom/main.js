@@ -29,7 +29,8 @@ create({
   headless: true,
   browserArgs: ['--no-sandbox'],
   folderNameToken: 'tokens',
-  mkdirFolderToken: './tokens',
+  mkdirFolderToken: '.',
+  
 }).then((client) => {
   venomClient = client;
   console.log('🤖 Venom pronto.');
