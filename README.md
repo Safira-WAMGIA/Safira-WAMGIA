@@ -1,4 +1,5 @@
-# 🔷 Safira WAMGIA
+# 🔷 Safira WAMGIA ![Safira CI Status](https://github.com/Safira-WAMGIA/Safira-WAMGIA/actions/workflows/ci-main.yml/badge.svg)
+
 
 ![Versão](https://img.shields.io/badge/Versão-2025.04‑rev‑stable-blue?style=flat-square)
 ![Licença](https://img.shields.io/badge/Licença-Particular-red?style=flat-square)
