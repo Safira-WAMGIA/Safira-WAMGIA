@@ -42,7 +42,7 @@ jobs:
           fi
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: coverage-report-${{ github.sha }}
           path: coverage.xml
@@ -86,7 +86,7 @@ jobs:
       - name: Export resolved compose (debug)
         run: docker compose config > compose-resolved-${{ github.sha }}.yml
 
-      - uses: actions/upload-artifact@v3.1.0
+      - uses: actions/upload-artifact@v4.6.2
         with:
           name: compose-resolved-${{ github.sha }}
           path: compose-resolved-${{ github.sha }}.yml
