@@ -11,11 +11,13 @@ volumes:
   pgdata:
   tts-cache:
   jira-data:
+  wiki-data:
 
 
 services:
   safira-core:
     image: n8nio/n8n
+    container_name: Safira-n8n
     ports: ["5678:5678"]
     networks: [safira-net]
     volumes:
@@ -26,11 +28,18 @@ services:
       - whatsapp
       - llm-ollama
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   whatsapp:
     build:
       context: ./build/venom
       dockerfile: Dockerfile
+    container_name: Safira-Whatsapp
     ports: ["3000:3000"]
     networks: [safira-net]
     volumes:
@@ -39,18 +48,33 @@ services:
     environment:
       - WEBHOOK_URL=${WEBHOOK_URL}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   llm-ollama:
     image: ollama/ollama
+    container_name: Safira-Ollama
     ports: ["11434:11434"]
     networks: [safira-net]
     volumes:
       - ollama-data:/models
     env_file: .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 
   whisper:
     build: ./build/whisper
+    container_name: Safira-STT
     ports: ["9000:9000"]
     networks: [safira-net]
     volumes:
@@ -65,9 +89,17 @@ services:
       - safira-core
       - llm-ollama
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
 
   tts:
     build: ./build/tts
+    container_name: Safira-TTS
     ports: ["5000:5000"]
     networks: [safira-net]
     volumes:
@@ -77,26 +109,39 @@ services:
       MODEL_NAME: tts_models/multilingual/multi-dataset/xtts_v2
       USE_CUDA: "false"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
 
   postgree:
     image: postgres:16
+    container_name: Safira-DB
     ports: ["5432:5432"]
     networks: [safira-net]
     volumes:
       - pgdata:/var/lib/postgresql/data
     env_file: .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   jira:
     image: atlassian/jira-software:latest
-    container_name: jira
+    container_name: Safira-Jira
     ports:
       - "8080:8080"
     networks:
       - safira-net
     volumes:
       - jira-data:/var/atlassian/application-data/jira
-      - pgdata:/var/lib/postgresql/data
       - ./build/postgree:/docker-entrypoint-initdb.d
     environment:
       - ATL_JDBC_URL=jdbc:postgresql://postgree:5432/jiradb
@@ -105,3 +150,36 @@ services:
     depends_on:
       - postgree
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+
+  wikijs:
+    image: requarks/wiki:2
+    container_name: Safira-Docs
+    ports:
+      - "3001:3000"
+    networks:
+      - safira-net
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: postgree
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: ${POSTGRES_PASSWORD}
+      DB_NAME: wikidb
+    depends_on:
+      - postgree
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+

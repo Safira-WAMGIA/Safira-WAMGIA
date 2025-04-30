@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# Estética
 BOLD="\e[1m"; DIM="\e[2m"; RESET="\e[0m"
 RED="\e[31m"; GRN="\e[32m"; YLW="\e[33m"; CYN="\e[36m"
 log() {
@@ -9,6 +10,7 @@ log() {
   printf "%b[%-5s]%b %s\n" "$CYN" "$lvl" "$RESET" "$*"
 }
 
+# Trap de erro com shell interativo
 cleanup() {
   local code=$?
   [[ $code -ne 0 ]] && echo -e "\n${RED}❌ Script terminou com erro ($code).${RESET}"
@@ -17,6 +19,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Flags
 COMPOSE="docker-compose.yml"
 ENV_FILE=".env"; ENV_EX=".env.example"
 BUILD=false; UP_ONLY=false; RESET=false; STATUS=false; NONINT=false
@@ -29,15 +32,30 @@ for arg in "$@"; do case $arg in
   *) log WARN "Flag desconhecida: $arg";;
 esac; done
 
-$RESET  && { log INFO "Resetando stack"; docker compose -f "$COMPOSE" down -v --remove-orphans; exit; }
-$STATUS && { docker compose -f "$COMPOSE" ps; exit; }
+# Pré-validação de comandos
+for cmd in docker "docker compose"; do
+  command -v ${cmd%% *} >/dev/null || { echo -e "${RED}$cmd ausente${RESET}"; exit 1; }
+done
 
-for cmd in docker "docker compose"; do command -v ${cmd%% *} >/dev/null || { echo -e "${RED}$cmd ausente${RESET}"; exit 1; }; done
-
+# .env fallback
 [[ -f $ENV_FILE ]] || { [[ -f $ENV_EX ]] && cp "$ENV_EX" "$ENV_FILE"; }
 
+# YAML check
 docker compose -f "$COMPOSE" config -q || { echo -e "${RED}YAML inválido${RESET}"; exit 1; }
 
+# Ações únicas
+if $RESET; then
+  log INFO "Resetando stack"
+  docker compose -f "$COMPOSE" down -v --remove-orphans
+  exit 0
+fi
+
+if $STATUS; then
+  docker compose -f "$COMPOSE" ps
+  exit 0
+fi
+
+# Build ou Pull
 if ! $UP_ONLY; then
   if $BUILD; then
     log INFO "Rebuild completo (--build)"
@@ -52,33 +70,37 @@ else
   log INFO "--up ativo: pulando pull/build"
 fi
 
+# Subindo stack
 log INFO "Subindo containers"
 docker compose -f "$COMPOSE" up -d --remove-orphans || true
 
-echo -e "\n${BOLD}📊 RESUMO${RESET}"
+# Resumo visual
+echo -e "\n📊 ${BOLD}RESUMO${RESET}"
 if ! docker compose -f "$COMPOSE" ps --format "table {{.Name}}\t{{.State}}\t{{.Ports}}" 2>/dev/null; then
   docker compose -f "$COMPOSE" ps
 fi
 
+# Endpoints úteis
 cat <<EOF
 
-${BOLD}🌐 ENDPOINTS${RESET}
+🌐 ENDPOINTS
   n8n         → http://localhost:5678
-  Venom       → http://localhost:3000
-  Whisper     → http://localhost:9000
-  TTS         → http://localhost:9001
-  PostgreSQL  → localhost:5432
-  Ollama      → http://localhost:11434
+  Jira        → http://localhost:8080
+  WikiJS      → http://localhost:3001
 EOF
 
 SUCCESS=1
 
-if docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | \
-   grep -Eq 'whisper.*running|whisper.*started' && \
-   grep -Eq 'tts.*running|tts.*started'; then
+# Verifica se whisper e tts estão rodando
+if docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | grep -Eq 'whisper.*running|whisper.*started' && \
+   docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | grep -Eq 'tts.*running|tts.*started'; then
   SUCCESS=0
 fi
 
-[[ $SUCCESS -eq 0 ]] && exit 0
+if [[ $SUCCESS -eq 0 ]]; then
+  exit 0
+fi
 
-$NONINT && exit 0
+if $NONINT; then
+  exit 0
+fi
