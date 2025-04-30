@@ -82,8 +82,28 @@ app.post('/send', async (req, res) => {
         break;
 
       case 'audio':
-        await venomClient.sendPttFromBase64(to, file?.data, file?.filename || 'audio.ogg');
+        try {
+          console.log('📤 Enviando áudio com: sendFileFromBase64');
+          console.log('➡️ To:', to);
+          console.log('➡️ Mimetype:', file?.mimetype);
+          console.log('➡️ Filename:', file?.filename);
+          console.log('➡️ Base64 (primeiros 50):', file?.data?.slice(0, 50));
+      
+          await venomClient.sendFileFromBase64(
+            to,
+            file?.data,
+            file?.filename || 'audio.ogg',
+            '',
+            file?.mimetype || 'audio/ogg'
+          );
+      
+          console.log('✅ Enviado com sucesso!');
+        } catch (err) {
+          console.error('❌ Erro ao enviar áudio:', err);
+        }
         break;
+        
+        
 
       case 'video':
         await venomClient.sendVideoAsGifFromBase64(to, file?.data, file?.filename || 'video.mp4', caption);

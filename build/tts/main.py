@@ -36,6 +36,40 @@ async def tts_endpoint(req: TTSRequest):
     buf.seek(0)
     return StreamingResponse(buf, media_type="audio/wav")
 
+from fastapi.responses import JSONResponse
+import base64
+
+@app.post("/tts/json", summary="Texto → áudio base64")
+async def tts_json_endpoint(req: TTSRequest):
+    txt = req.text.strip()
+    if not txt:
+        raise HTTPException(400, "Campo 'text' vazio.")
+
+    try:
+        wav = tts.tts(
+            text=txt,
+            language=req.language_id,
+            speaker_wav=req.speaker_wav
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Erro ao sintetizar áudio: {str(e)}")
+
+    buf = io.BytesIO()
+    sf.write(buf, wav, tts.synthesizer.output_sample_rate, format="OGG", subtype="OPUS")
+    buf.seek(0)
+    audio_bytes = buf.getvalue()
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8").replace('\n', '')
+
+
+    return JSONResponse({
+        "file": {
+            "filename": "tts.ogg",
+            "mimetype": "audio/ogg; codecs=opus",
+            "data": audio_base64
+        }
+    })
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
