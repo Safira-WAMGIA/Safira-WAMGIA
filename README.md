@@ -1,4 +1,5 @@
-# 🔷 Safira WAMGIA
+# 🔷 Safira WAMGIA ![🔄 Build Status](https://img.shields.io/badge/build-running-lightgrey)
+
 
 ![Versão](https://img.shields.io/badge/Versão-2025.04‑rev‑stable-blue?style=flat-square)
 ![Licença](https://img.shields.io/badge/Licença-Particular-red?style=flat-square)
