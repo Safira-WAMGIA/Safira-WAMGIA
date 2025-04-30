@@ -1,6 +1,12 @@
-import os, tempfile, subprocess, uuid, json, wave
+import os
+import tempfile
+import subprocess
+import uuid
 from flask import Flask, request, jsonify
 from faster_whisper import WhisperModel
+
+# restante do código...
+
 
 
 MODEL_SIZE   = os.getenv("WHISPER_MODEL", "large-v3") 
