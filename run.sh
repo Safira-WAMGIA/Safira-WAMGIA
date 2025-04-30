@@ -1,126 +1,213 @@
 #!/usr/bin/env bash
-###############################################################################
-#  Safira – run.sh (v5‑all‑features)                                           #
-#                                                                              #
-#  Sub‑comandos:                                                               #
-#    up [profile] [--no-build] [--dev]      # valida → pull → up ‑d            #
-#    down                                   # derruba stack                     #
-#    restart                                # down + up                         #
-#    status                                 # tabela ps + erro de services      #
-#    logs <svc> [--save]                    # segue ou salva logs               #
-#    prune [soft]                           # soft → mantém volumes nomeados    #
-#    profiles                               # lista profiles disponíveis         #
-#    completion                             # gera script de auto‑complete bash #
-#                                                                              #
-###############################################################################
 set -Eeuo pipefail
-shopt -s inherit_errexit 2>/dev/null || true
 
-# ───── Paleta — evita escape em Windows cmd ───────────────────────────────
-case "${TERM:-}" in xterm*|screen*|vt*) BOLD="\e[1m"; CYAN="\e[36m"; RED="\e[31m"; RESET="\e[0m";; *) BOLD=""; CYAN=""; RED=""; RESET="";; esac
-info(){  printf "%b%s%b\n" "$CYAN" "$1" "$RESET"; }
-error(){ printf "%b%s%b\n" "$RED"  "$1" "$RESET" >&2; }
-banner(){ info "\n$1"; }
-trap 'error "\n❌ Algo deu errado."; read -n1 -s -r -p "🔁  Pressione qualquer tecla…"; exit 1' ERR
-
-# ───── Argparse simplificado ──────────────────────────────────────────────
-action=${1:-help}; shift || true
-dev=false; nobuild=false; save_logs=false; profile=""; svc=""; prune_soft=false
-while [[ $# -gt 0 ]]; do case $1 in
-  --dev)      dev=true ;;
-  --no-build) nobuild=true ;;
-  --save)     save_logs=true ;;
-  soft)       prune_soft=true ;;
-  *) if [[ -z $profile && $action =~ ^(up|restart)$ && ! $1 =~ ^- ]]; then profile=$1
-     elif [[ -z $svc && $action == logs ]]; then svc=$1
-     else error "Argumento desconhecido: $1"; exit 1; fi ;;
-esac; shift; done
-
-valid_cmds="up down restart status logs prune profiles completion help"
-if ! grep -qw "$action" <<<"$valid_cmds"; then error "Uso: $0 <${valid_cmds// /|}> [options]"; exit 1; fi
-
-# ───── Pré‑requisitos ─────────────────────────────────────────────────────
-command -v docker >/dev/null 2>&1 || { error "Docker não instalado."; exit 1; }
-if ! docker info >/dev/null 2>&1; then error "Docker daemon parado."; exit 1; fi
-if command -v docker-compose >/dev/null 2>&1; then DOCKER_COMPOSE="docker-compose"
-elif docker compose version >/dev/null 2>&1;  then DOCKER_COMPOSE="docker compose"
-else error "docker compose não encontrado."; exit 1; fi
-
-# ───── Helpers de path/uid ────────────────────────────────────────────────
-ENSURE_DIRS=(backup shared docs)
-ensure_dirs(){ for d in "${ENSURE_DIRS[@]}"; do [[ -d $d ]] || mkdir -p "$d"; done }
-fix_permissions(){ for d in "${ENSURE_DIRS[@]}"; do sudo chown -R "$(id -u):$(id -g)" "$d" || true; done }
-
-# ───── Compose wrappers ───────────────────────────────────────────────────
-compose(){ $DOCKER_COMPOSE ${profile:+--profile "$profile"} "$@"; }
-validate_config(){ compose --env-file .env config >/dev/null; }
-compose_pull(){ $nobuild || compose pull --quiet; }
-compose_up(){ validate_config; compose_pull; compose up -d ${nobuild:+} ${nobuild:+} ; }
-compose_down(){ compose down --remove-orphans --timeout 20; }
-compose_status(){ compose ps --format "table {{.Service}}\t{{.State}}\t{{.PublishedPorts}}"; }
-
-# ───── Health‑waiter ─────────────────────────────────────────────────────-
-wait_healthy(){
-  banner "⏳  Aguardando serviços ficarem healthy…"
-  end=$((SECONDS+300))
-  while true; do
-    unhealthy=$(compose ps --filter "status=running" --filter "status=starting" --format "{{.Service}} {{.Health}}" | awk '$2!="healthy"{print $1}')
-    [[ -z $unhealthy ]] && break
-    if (( SECONDS > end )); then error "Timeout aguardando: $unhealthy"; exit 1; fi
-    sleep 2
-  done
-  info "✅ Todos os serviços healthy"
+# Estética
+BOLD="\e[1m"; DIM="\e[2m"; RESET="\e[0m"
+RED="\e[31m"; GRN="\e[32m"; YLW="\e[33m"; CYN="\e[36m"
+log() {
+  local lvl="$1"; shift
+  while [[ "$1" == "true" || "$1" == "false" ]]; do shift; done
+  printf "%b[%-5s]%b %s\n" "$CYN" "$lvl" "$RESET" "$*"
 }
 
-# ───── Secrets / arquivos (skippable em --dev) ────────────────────────────
-check_files(){
-  local missing=(); for f in .env prometheus/prometheus.yml traefik/traefik.yml loki/loki-config.yaml docs/docs/index.md docs/mkdocs.yml; do [[ -f $f ]]||missing+=("$f"); done
-  ((${#missing[@]})) && { error "Arquivos faltantes: ${missing[*]} (rode ./setup.sh)"; exit 1; }
+# Trap de erro com shell interativo
+cleanup() {
+  local code=$?
+  [[ $code -ne 0 ]] && echo -e "\n${RED}❌ Script terminou com erro ($code).${RESET}"
+  echo -e "${DIM}💡 Shell interativo aberto. Digite 'exit' para sair.${RESET}"
+  exec "$SHELL" -l
 }
-check_secrets(){
-  local expected=(pg_safira_pwd pg_pagamento_pwd pg_jira_pwd minio_pwd grafana_pwd traefik_pwd jenkins_admin_pwd supa_db_pwd jwt_secret anon_key service_role_key)
-  local miss=(); for s in "${expected[@]}"; do docker secret inspect "$s" >/dev/null 2>&1 || miss+=("$s"); done
-  ((${#miss[@]})) && { error "Secrets ausentes: ${miss[*]}"; exit 1; }
-}
-$dev || { check_files; check_secrets; }
-ensure_dirs; fix_permissions
+trap cleanup EXIT
 
-# ───── Funções adicionais ────────────────────────────────────────────────
-show_endpoints(){ source .env || true; cat <<EOF
-Safira (n8n)  http://localhost:${PORT_SAFIRA:-5678}
-Admin (n8n)   http://localhost:${PORT_ADMIN:-5680}
-Venom API     http://localhost:${PORT_VENOM:-3001}
-STT           http://localhost:${PORT_STT:-9000}
-CSM/TTS       http://localhost:${PORT_CSM:-5050}
-Ollama        http://localhost:${PORT_OLLAMA:-11434}
-… (outros omitidos)
+# Flags
+COMPOSE="docker-compose.yml"
+ENV_FILE=".env"; ENV_EX=".env.example"
+BUILD=false; UP_ONLY=false; RESET=false; STATUS=false; NONINT=false
+for arg in "$@"; do case $arg in
+  --build) BUILD=true;;
+  --up)    UP_ONLY=true;;
+  --reset) RESET=true;;
+  --status) STATUS=true;;
+  --non-interactive) NONINT=true;;
+  *) log WARN "Flag desconhecida: $arg";;
+esac; done
+
+# Pré-validação de comandos
+for cmd in docker "docker compose"; do
+  command -v ${cmd%% *} >/dev/null || { echo -e "${RED}$cmd ausente${RESET}"; exit 1; }
+done
+
+# .env fallback
+[[ -f $ENV_FILE ]] || { [[ -f $ENV_EX ]] && cp "$ENV_EX" "$ENV_FILE"; }
+
+# YAML check
+docker compose -f "$COMPOSE" config -q || { echo -e "${RED}YAML inválido${RESET}"; exit 1; }
+
+# Ações únicas
+if $RESET; then
+  log INFO "Resetando stack"
+  docker compose -f "$COMPOSE" down -v --remove-orphans
+  exit 0
+fi
+
+if $STATUS; then
+  docker compose -f "$COMPOSE" ps
+  exit 0
+fi
+
+# Build ou Pull
+if ! $UP_ONLY; then
+  if $BUILD; then
+    log INFO "Rebuild completo (--build)"
+    docker compose -f "$COMPOSE" build || true
+  else
+    log INFO "Pulling imagens"
+    if ! docker compose -f "$COMPOSE" pull; then
+      log WARN "Pull falhou; usando imagens locais"
+    fi
+  fi
+else
+  log INFO "--up ativo: pulando pull/build"
+fi
+
+# Subindo stack
+log INFO "Subindo containers"
+docker compose -f "$COMPOSE" up -d --remove-orphans || true
+
+# Resumo visual
+echo -e "\n📊 ${BOLD}RESUMO${RESET}"
+if ! docker compose -f "$COMPOSE" ps --format "table {{.Name}}\t{{.State}}\t{{.Ports}}" 2>/dev/null; then
+  docker compose -f "$COMPOSE" ps
+fi
+
+# Endpoints úteis
+cat <<EOF
+
+🌐 ENDPOINTS
+  n8n         → http://localhost:5678
+  Jira        → http://localhost:8080
+  WikiJS      → http://localhost:3001
 EOF
-}
-list_profiles(){ banner "📂  Profiles disponíveis"; grep -A1 '^profiles:' -n docker-compose.yml | awk -F: '/^ *[a-zA-Z0-9_-]+:$/ {print $2}' | sort -u; }
-completion_script(){ cat <<'BASH'
-_complete_safira(){
-  local cur prev opts cmd
-  COMPREPLY=(); cur="${COMP_WORDS[COMP_CWORD]}"; prev="${COMP_WORDS[COMP_CWORD-1]}"
-  opts="up down restart status logs prune profiles completion help"
-  if [[ $COMP_CWORD == 1 ]]; then COMPREPLY=( $(compgen -W "$opts" -- $cur) ); return; fi
-}
-complete -F _complete_safira run.sh
-BASH
-}
 
-# ───── Execução principal ───────────────────────────────────────────────
-case $action in
-  up)
-    banner "🚀  Subindo stack (profile: ${profile:-default})"; compose_up; wait_healthy; show_endpoints ;;
-  down) banner "🛑  Derrubando stack"; compose_down ;;
-  restart) compose_down; compose_up; wait_healthy; ;;
-  status) compose_status; compose ps --filter "status=exited" && true ;;
-  logs)
-    [[ -z $svc ]] && { error "Informe ./run.sh logs <service> [--save]"; exit 1; }
-    if $save_logs; then compose logs "$svc" > "logs/${svc}_$(date +%F_%H%M).log"; info "📝 Logs salvos em logs/"; else compose logs -f "$svc"; fi ;;
-  prune)
-    if $prune_soft; then docker image prune -f; docker container prune -f; else docker system prune -f --volumes; fi ;;
-  profiles) list_profiles ;;
-  completion) completion_script ;;
-  help) echo "Ver README" ;;
-esac
+SUCCESS=1
+
+# Verifica se whisper e tts estão rodando
+if docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | grep -Eq 'whisper.*running|whisper.*started' && \
+   docker compose -f "$COMPOSE" ps --format '{{.Name}} {{.State}}' | grep -Eq 'tts.*running|tts.*started'; then
+  SUCCESS=0
+fi
+
+# Aguarda containers essenciais ficarem prontos
+REQUIRED_CONTAINERS=("Safira-DB" "Safira-Ollama")
+TIMEOUT=90
+INTERVAL=5
+elapsed=0
+
+log INFO "Aguardando containers essenciais ficarem prontos..."
+
+while true; do
+  ready=true
+  for container in "${REQUIRED_CONTAINERS[@]}"; do
+    state=$(docker inspect -f '{{.State.Health.Status}}' "$container" 2>/dev/null || echo "unavailable")
+    # Se for unhealthy ou indisponível, avisar e aguardar
+    if [[ "$state" == "exited" || "$state" == "dead" || "$state" == "unavailable" ]]; then
+      log WARN "Aguardando '$container' (estado crítico: $state)"
+      ready=false
+
+    # Se estiver apenas em starting, toleramos dentro do timeout
+    elif [[ "$state" == "starting" ]]; then
+      log INFO "Aguardando '$container' (estado: $state)"
+      ready=false
+    else
+      log INFO "✅ '$container' está pronto (estado: $state)"
+    fi
+
+  done
+
+  if $ready; then
+    log INFO "✅ Todos os containers essenciais estão prontos"
+    break
+  fi
+
+  sleep "$INTERVAL"
+  ((elapsed+=INTERVAL))
+  if (( elapsed >= TIMEOUT )); then
+    log ERROR "⏰ Timeout: containers não ficaram prontos em $TIMEOUT segundos"
+    exit 1
+  fi
+done
+
+# Log e variáveis
+CYN="\e[36m"; RED="\e[31m"; GRN="\e[32m"; RESET="\e[0m"
+log() { printf "%b[CONFIG]%b %s\n" "$CYN" "$RESET" "$1"; }
+err() { printf "%b[ERRO]%b %s\n" "$RED" "$RESET" "$1" >&2; }
+
+# Carrega variáveis do .env
+ENV_FILE=".env"
+if [[ -f "$ENV_FILE" ]]; then
+  export $(grep -v '^#' "$ENV_FILE" | xargs)
+else
+  err ".env não encontrado"
+  exit 1
+fi
+
+# ───── Verifica e cria bancos de dados ───────────────────────────────
+DB_CONTAINER="Safira-DB"
+DB_USER="postgres"
+DB_PASS="${POSTGRES_PASSWORD:-}"
+DB_NAMES=("jiradb" "wikidb")
+
+log "🔍 Verificando bancos de dados no container '$DB_CONTAINER'..."
+
+if ! docker ps --format '{{.Names}}' | grep -q "$DB_CONTAINER"; then
+  err "Container do banco ($DB_CONTAINER) não está rodando"
+  exit 1
+fi
+
+for db in "${DB_NAMES[@]}"; do
+  log "Verificando banco '$db'..."
+  EXISTS=$(docker exec -e PGPASSWORD="$DB_PASS" "$DB_CONTAINER" \
+    psql -U "$DB_USER" -tAc "SELECT 1 FROM pg_database WHERE datname = '$db';")
+
+  if [[ "$EXISTS" == "1" ]]; then
+    log "✅ Banco '$db' já existe"
+  else
+    log "🔧 Criando banco '$db'..."
+    docker exec -e PGPASSWORD="$DB_PASS" "$DB_CONTAINER" \
+      psql -U "$DB_USER" -c "CREATE DATABASE \"$db\";"
+    log "✅ Banco '$db' criado com sucesso"
+  fi
+done
+
+# ───── Verifica e baixa modelos no Ollama ────────────────────────────
+log "🔍 Verificando e puxando modelos no Ollama..."
+
+OLLAMA_CONTAINER="Safira-Ollama"
+MODELOS=("llama3.2" "llama3.1:8b" "llama3:instruct")
+
+if ! docker ps --format '{{.Names}}' | grep -q "$OLLAMA_CONTAINER"; then
+  err "Container Ollama ($OLLAMA_CONTAINER) não está rodando"
+  exit 1
+fi
+
+for modelo in "${MODELOS[@]}"; do
+  log "🔎 Checando modelo '$modelo'..."
+  if docker exec "$OLLAMA_CONTAINER" ollama list | awk '{print $1}' | grep -qx "$modelo"; then
+    log "✅ Modelo '$modelo' já está disponível"
+  else
+    log "⬇️  Fazendo pull do modelo '$modelo'..."
+    docker exec "$OLLAMA_CONTAINER" ollama pull "$modelo" || {
+      err "❌ Falha ao puxar '$modelo'"
+      exit 1
+    }
+    log "✅ Modelo '$modelo' baixado com sucesso"
+  fi
+done
+
+if [[ $SUCCESS -eq 0 ]]; then
+  exit 0
+fi
+
+if $NONINT; then
+  exit 0
+fi

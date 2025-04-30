@@ -1,2 +1,65 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# ───────────────────────────────────────────────
+# Normaliza final de linha para evitar conflitos em múltiplos SOs
+* text=auto eol=lf
+
+# ───────────────────────────────────────────────
+# Arquivos que precisam de tratamento de diff especial
+*.md      diff=markdown
+*.yml     diff=yaml
+*.yaml    diff=yaml
+*.json    diff=json
+*.py      diff=python
+*.sh      diff=sh
+*.env     diff=env
+*.txt     diff=astextplain
+Dockerfile diff=dockerfile
+
+# ───────────────────────────────────────────────
+# Arquivos binários — sem diff
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.mp3     binary
+*.mp4     binary
+*.wav     binary
+*.ogg     binary
+*.webp    binary
+*.ttf     binary
+*.woff    binary
+*.woff2   binary
+
+# ───────────────────────────────────────────────
+# Linguagens específicas
+*.py linguist-language=Python
+*.sh linguist-language=Shell
+*.md linguist-language=Markdown
+*.yml linguist-language=YAML
+*.json linguist-language=JSON
+*.js linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+*.scss linguist-language=SCSS
+Dockerfile linguist-language=Dockerfile
+
+# ───────────────────────────────────────────────
+# Força UTF-8 e evita problemas de codificação
+*.py text eol=lf charset=utf-8
+*.sh text eol=lf charset=utf-8
+*.md text eol=lf charset=utf-8
+*.json text eol=lf charset=utf-8
+*.yml text eol=lf charset=utf-8
+
+# ───────────────────────────────────────────────
+# Evita que arquivos de log, dados e binários sejam analisados
+*.log     -diff
+*.db      -diff
+*.sqlite3 -diff
+*.tar     -diff
+*.zip     -diff
+*.gz      -diff
+*.exe     -diff
+*.bin     -diff
