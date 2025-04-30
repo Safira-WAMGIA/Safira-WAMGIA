@@ -44,6 +44,7 @@ services:
     networks: [safira-net]
     volumes:
       - venom-data:/app/sessions
+      - venom-data:/app/tokens
     env_file: .env
     environment:
       - WEBHOOK_URL=${WEBHOOK_URL}
@@ -62,6 +63,7 @@ services:
     networks: [safira-net]
     volumes:
       - ollama-data:/models
+      - ollama-data:/root/.ollama
     env_file: .env
     restart: unless-stopped
     healthcheck:
