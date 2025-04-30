@@ -1,0 +1,32 @@
+name: CI com badge no README
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: |
+          pip install pytest ruff
+          ruff . && pytest
+
+      - name: Atualizar badge do README
+        if: success()
+        run: |
+          sed -i 's/!\[.*\](.*badge.*)/![✅ Build Passed](https:\/\/img.shields.io\/badge\/build-passed-brightgreen)/' README.md
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "🤖 CI passed - atualizando badge"
+          git push
