@@ -10,6 +10,8 @@ volumes:
   whisper-models:
   pgdata:
   tts-cache:
+  jira-data:
+
 
 services:
   safira-core:
@@ -76,9 +78,6 @@ services:
       USE_CUDA: "false"
     restart: unless-stopped
 
-
-
-
   postgree:
     image: postgres:16
     ports: ["5432:5432"]
@@ -86,4 +85,23 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     env_file: .env
+    restart: unless-stopped
+
+  jira:
+    image: atlassian/jira-software:latest
+    container_name: jira
+    ports:
+      - "8080:8080"
+    networks:
+      - safira-net
+    volumes:
+      - jira-data:/var/atlassian/application-data/jira
+      - pgdata:/var/lib/postgresql/data
+      - ./build/postgree:/docker-entrypoint-initdb.d
+    environment:
+      - ATL_JDBC_URL=jdbc:postgresql://postgree:5432/jiradb
+      - ATL_JDBC_USER=${POSTGRES_USER}
+      - ATL_JDBC_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgree
     restart: unless-stopped
