@@ -61,8 +61,7 @@ async def tts_json_endpoint(req: TTSRequest):
     sf.write(buf, wav, tts.synthesizer.output_sample_rate, format="OGG", subtype="OPUS")
     buf.seek(0)
     audio_bytes = buf.getvalue()
-audio_base64 = base64.b64encode(audio_bytes).decode("utf-8").replace('\n', '')
-
+    audio_base64 = base64.b64encode(audio_bytes).decode("utf-8").replace('\n', '')
 
     return JSONResponse({
         "file": {
@@ -71,6 +70,7 @@ audio_base64 = base64.b64encode(audio_bytes).decode("utf-8").replace('\n', '')
             "data": audio_base64
         }
     })
+
 
 
 @app.get("/health")
