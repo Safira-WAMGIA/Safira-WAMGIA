@@ -1,6 +1,95 @@
-composer.phar
-/vendor/
+# ───────────────────────────────────────────────
+# Arquivos e pastas Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg-info/
+*.egg
+*.log
+*.sqlite3
+*.db
+.env
+.env.*
+.envrc
 
-# Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
-# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
-# composer.lock
+# ───────────────────────────────────────────────
+# Docker
+docker-compose.override.yml
+.docker/
+*.pid
+*.sock
+docker-data/
+docker-volumes/
+docker-logs/
+*.tar
+*.img
+*.bak
+
+# ───────────────────────────────────────────────
+# N8N
+n8n/.n8n/
+n8n/files/
+n8n/storage/
+n8n/tmp/
+n8n/logs/
+
+# ───────────────────────────────────────────────
+# Venom (WhatsApp bot)
+venom/session/
+venom/temp/
+venom/chrome/
+venom/cache/
+venom/screenshots/
+
+# ───────────────────────────────────────────────
+# Outros containers com arquivos persistentes
+ollama/models/
+stt/models/
+tts/models/
+csm/cache/
+ai-functions/.cache/
+image-reader/output/
+image-generator/output/
+file-manager/uploads/
+
+# ───────────────────────────────────────────────
+# Node.js e outras linguagens (caso use no front ou scripts)
+node_modules/
+dist/
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ───────────────────────────────────────────────
+# CI/CD & DevOps
+coverage/
+.tox/
+.pytest_cache/
+__pypackages__/
+test-results/
+reports/
+.secrets/
+.github/workflows/*.generated.yml
+
+# ───────────────────────────────────────────────
+# Arquivos gerados pelo sistema
+*.tmp
+*.bak
+*.old
+*.orig
+*.rej
+*~
+# arquivos temporários do shell
+*.sw?
+# Arquivos de lock
+Pipfile.lock
+poetry.lock
+yarn.lock
+package-lock.json
