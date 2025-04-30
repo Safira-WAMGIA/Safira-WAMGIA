@@ -1,13 +1,14 @@
+name: Safira CI - Release
+
 on:
   push:
     branches:
       - 'release/**'
 
 jobs:
-  build-staging:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build Docker containers
+      - uses: actions/checkout@v4
+      - name: Run docker compose build
         run: docker compose -f docker-compose.yml up --build -d
