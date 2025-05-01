@@ -12,11 +12,11 @@ on:
 jobs:
   badge:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout da branch original
-        uses: actions/checkout@v4
+        uses: actions/upload-artifact@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
