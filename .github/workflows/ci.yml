@@ -26,10 +26,14 @@ jobs:
       - name: Instalar dependências
         run: |
           pip install pytest ruff
-          ruff . && pytest
+
+      - name: Rodar Ruff + Pytest
+        run: |
+          ruff --version
+          ruff check . && pytest
 
       - name: Atualizar badge do README
-        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/'))
+        if: success() && (startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/release/'))
         run: |
           sed -i 's|<!-- status-badge --> !\[.*\](.*)|<!-- status-badge --> ![✅ Build Passed](https://img.shields.io/badge/build-passed-brightgreen)|' README.md
           git config user.name "github-actions"
