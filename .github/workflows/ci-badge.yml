@@ -2,7 +2,7 @@ name: Atualiza badge no README
 
 on:
   workflow_run:
-    workflows: ["Safira CI - Develop"]
+    workflows: ["Safira CI - Develop", "Safira CI/CD - Main", "Safira CI - Release"]
     types:
       - completed
 
