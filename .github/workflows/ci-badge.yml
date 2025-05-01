@@ -1,4 +1,4 @@
-name: Atualiza badge no README
+name: Atualiza badge do README
 
 on:
   workflow_run:
@@ -8,11 +8,14 @@ on:
 
 jobs:
   badge:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && (startsWith(github.event.workflow_run.head_branch, 'main') || startsWith(github.event.workflow_run.head_branch, 'release/')) }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout do repositório na branch certa
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
 
       - name: Atualizar badge no README
         run: |
@@ -20,4 +23,4 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git commit -am "🤖 Atualizando badge após CI"
-          git push
+          git push origin ${{ github.event.workflow_run.head_branch }}
