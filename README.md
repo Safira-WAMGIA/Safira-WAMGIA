@@ -1,4 +1,4 @@
-# 🔷 Safira WAMGIA ![CI Status](https://img.shields.io/badge/ci-badge-placeholder-lightgrey)
+# 🔷 Safira WAMGIA ![CI Status](https://img.shields.io/badge/ci-badge-running-lightgrey)
 
 
 
