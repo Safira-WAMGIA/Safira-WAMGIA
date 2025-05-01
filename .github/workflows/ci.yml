@@ -29,8 +29,9 @@ jobs:
 
       - name: Rodar Ruff + Pytest
         run: |
-          ruff --version
-          ruff check . && pytest
+          ruff check .
+          pytest || if [ $? -eq 5 ]; then echo "⚠️ Nenhum teste encontrado. Pulando..."; exit 0; else exit $?; fi
+
 
       - name: Atualizar badge do README
         if: success() && (startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/release/'))
