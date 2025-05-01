@@ -1,0 +1,23 @@
+name: Atualiza badge no README
+
+on:
+  workflow_run:
+    workflows: ["Safira CI - Develop"]
+    types:
+      - completed
+
+jobs:
+  badge:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (startsWith(github.event.workflow_run.head_branch, 'main') || startsWith(github.event.workflow_run.head_branch, 'release/')) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Atualizar badge no README
+        run: |
+          sed -i 's|<!-- status-badge --> !\[.*\](.*)|<!-- status-badge --> ![✅ Build Passed](https://img.shields.io/badge/build-passed-brightgreen)|' README.md
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "🤖 Atualizando badge após CI"
+          git push
