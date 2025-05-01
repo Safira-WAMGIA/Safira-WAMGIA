@@ -1,0 +1,32 @@
+name: Atualiza badge no README
+
+on:
+  workflow_run:
+    workflows: ["Safira CI - Develop", "Safira CI/CD - Main", "Safira CI - Release"]
+    types:
+      - completed
+
+jobs:
+  badge:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout da branch original
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Importante para push funcionar
+
+      - name: Atualizar badge no README
+        run: |
+          echo "Atualizando badge na branch: ${{ github.event.workflow_run.head_branch }}"
+          sed -i 's|<!-- status-badge --> !\[.*\](.*)|<!-- status-badge --> ![✅ Build Passed](https://img.shields.io/badge/build-passed-brightgreen)|' README.md
+
+      - name: Commit e push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git commit -am "🤖 Atualizando badge após CI"
+          git push origin HEAD:${{ github.event.workflow_run.head_branch }}

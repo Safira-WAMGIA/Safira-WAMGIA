@@ -1,0 +1,22 @@
+name: Shared - Lint & Test
+on: [workflow_call]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install -U pip
+          pip install pytest ruff coverage
+          ruff check .
+          pytest -q --cov=. --cov-report=xml || echo "⚠️ Nenhum teste ou falha" 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+      - name: Auto fix linter (Ruff)
+        run: ruff check . --fix

@@ -1,10 +1,15 @@
-from fastapi.staticfiles import StaticFiles
-import io, os
+import base64
+import io
+import os
+
 import soundfile as sf
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from TTS.api import TTS
+
+
 
 MODEL_NAME = os.getenv("TTS_MODEL_NAME", "tts_models/multilingual/multi-dataset/xtts_v2")
 tts = TTS(model_name=MODEL_NAME, progress_bar=False, gpu=False)
@@ -36,8 +41,6 @@ async def tts_endpoint(req: TTSRequest):
     buf.seek(0)
     return StreamingResponse(buf, media_type="audio/wav")
 
-from fastapi.responses import JSONResponse
-import base64
 
 @app.post("/tts/json", summary="Texto → áudio base64")
 async def tts_json_endpoint(req: TTSRequest):
@@ -60,7 +63,6 @@ async def tts_json_endpoint(req: TTSRequest):
     audio_bytes = buf.getvalue()
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8").replace('\n', '')
 
-
     return JSONResponse({
         "file": {
             "filename": "tts.ogg",
@@ -68,6 +70,7 @@ async def tts_json_endpoint(req: TTSRequest):
             "data": audio_base64
         }
     })
+
 
 
 @app.get("/health")

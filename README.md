@@ -1,4 +1,6 @@
-# 🔷 Safira WAMGIA
+# 🔷 Safira WAMGIA ![CI Status](https://img.shields.io/badge/ci-badge-placeholder-lightgrey)
+
+
 
 ![Versão](https://img.shields.io/badge/Versão-2025.04‑rev‑stable-blue?style=flat-square)
 ![Licença](https://img.shields.io/badge/Licença-Particular-red?style=flat-square)

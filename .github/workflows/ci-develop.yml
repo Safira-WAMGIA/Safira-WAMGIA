@@ -1,0 +1,9 @@
+name: Safira CI - Develop
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  test:
+    uses: ./.github/workflows/_shared-test.yml
