@@ -2,9 +2,15 @@ name: CI com badge no README
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - develop
+      - 'release/**'
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - develop
+      - 'release/**'
 
 jobs:
   test:
@@ -23,9 +29,9 @@ jobs:
           ruff . && pytest
 
       - name: Atualizar badge do README
-        if: success()
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/'))
         run: |
-          sed -i 's/!\[.*\](.*badge.*)/![✅ Build Passed](https:\/\/img.shields.io\/badge\/build-passed-brightgreen)/' README.md
+          sed -i 's|<!-- status-badge --> !\[.*\](.*)|<!-- status-badge --> ![✅ Build Passed](https://img.shields.io/badge/build-passed-brightgreen)|' README.md
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git commit -am "🤖 CI passed - atualizando badge"
