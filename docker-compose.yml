@@ -86,7 +86,7 @@ services:
       WHISPER_MODEL: large-v3
       WHISPER_LANGUAGE: pt
       WHISPER_DEVICE: cpu
-      WHISPER_COMPUTE_TYPE: int8
+      WHISPER_COMPUTE_TYPE: int8 
     depends_on:
       - safira-core
       - llm-ollama
