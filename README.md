@@ -25,6 +25,14 @@
 - Retorna uma resposta inteligente em **texto**, **áudio** ou **imagem**
 - Aprende com as interações e pode manter contexto, histórico e preferências do usuário
 
+Um usuário envia um áudio no WhatsApp: "Me lembra de pagar o aluguel amanhã".
+
+1. A mensagem é recebida pelo container `whatsapp` (Venom) e enviada ao `safira-core` (n8n).
+2. O áudio é encaminhado ao serviço `whisper`, que transcreve para texto: "Me lembra de pagar o aluguel amanhã".
+3. A frase transcrita é enviada para o agente `Safira`, que interpreta e reconhece a intenção: criar um lembrete.
+4. O agente responde: "Pode deixar! Te lembro amanhã às 9h. 😉"
+5. A resposta é enviada por texto ou áudio (via `tts`) de volta ao usuário via WhatsApp.
+
 ### 🧩 Exemplo prático de uso
 Veja como a Safira pode atuar em diferentes contextos do dia a dia, de forma inteligente, sensível ao contexto e com respostas naturais:
 
@@ -83,110 +91,40 @@ Essa estratégia transforma a Safira em um verdadeiro agente de prospecção org
 
 ## 🧱 Arquitetura Geral (Dockerized Stack)
 
-A Safira opera via **Docker Compose**, utilizando 17 containers principais, separados por função:
+A stack é composta por múltiplos containers especializados, todos orquestrados via `docker-compose`. A comunicação entre eles ocorre na rede interna `safira-net`.
 
-### 🔹 Core e Inteligência
-| Nome            | Função                                 | Tags |
-|------------------|-------------------------------------------|------|
-| Safira-Core      | Motor principal dos fluxos n8n             | core |
-| Whatsapp (Venom) | Integração via WhatsApp (entrada)         | comunicacao |
-| LLM-Ollama       | Modelo LLM local (NLP e automação)         | llm, modelo |
-| SESANE           | Análise emocional e contexto de voz         | modelo |
+### 🧩 Serviços principais
 
-### 🔉 Voz (Entrada e Saída)
-| Nome     | Função                                   | Tags |
-|-----------|-----------------------------------------------|------|
-| Whisper   | STT: Transcrição de voz para texto             | output, audio |
-| Coqui     | TTS: Conversão de texto para voz humanizada    | input, audio |
-
-### 📊 Administração e Observabilidade
-| Nome        | Função                          | Tags |
-|-------------|----------------------------------|------|
-| Prometheus  | Coleta de métricas                 | admin |
-| Grafana     | Dashboards e visualização          | admin |
-| Jira        | Gestão de tarefas e roadmap        | admin |
-| Jenkins     | CI/CD e automação de deploy        | infra, admin |
-
-### 🌐 Infraestrutura
-| Nome     | Função                                | Tags |
-|----------|------------------------------------|------|
-| Traefik  | Gateway reverso / proxy dinâmico   | infra |
-| NGINXS   | Webserver / roteamento interno     | infra |
-| Redis    | Cache e mensagens leves            | infra |
-| MinIO    | Armazenamento de objetos (S3-like) | infra |
-| Postgree | Banco de dados principal           | infra, core |
-
-### 🖼️ Imagem (Input/Output)
-| Nome               | Função                                | Tags |
-|--------------------|------------------------------------------|------|
-| BLIP2              | Leitura e compreensão de imagens          | imagem, input |
-| Stable Diffusion   | Geração de imagens via texto (T2I)       | imagem, output |
-
-
-```mermaid
-%%{ init: { "flowchart": { "direction": "TB" } } }%%
-graph TD
-
-  VENOM["Venom (WhatsApp)"]
-  VENOM --> CORE["n8n (Core Orquestrador)"]
-
-  subgraph Classificacao da Entrada
-    CORE -->|Verifica tipo de conteúdo| CLASSIFICA["Classificador: texto, imagem ou áudio"]
-    CLASSIFICA -->|Áudio| COQUI["Coqui (STT - transcrição de áudio)"]
-    CLASSIFICA -->|Imagem| BLIP2["BLIP2 (OCR de imagem)"]
-    CLASSIFICA -->|Texto| OLLAMA_1["Ollama (LLM - entendimento de texto)"]
-    COQUI --> OLLAMA_2["Ollama"]
-    BLIP2 --> OLLAMA_3["Ollama"]
-  end
-
-  subgraph Processo Decisório
-    OLLAMA_1 --> CORE
-    OLLAMA_2 --> CORE
-    OLLAMA_3 --> CORE
-    CORE -->|Executa fluxos| MODULO["Fluxograma n8n"]
-    MODULO -->|Decide resposta| DECISAO["Responder com texto, voz ou imagem?"]
-  end
-
-  DECISAO -->|Resposta em texto| VENOM_TXT["Venom envia texto"]
-
-  DECISAO -->|Resposta em voz| WHISPER["Whisper (TTS - texto para áudio)"]
-  WHISPER --> CORE
-  CORE --> VENOM_AUDIO["Venom envia áudio"]
-
-  DECISAO -->|Resposta em imagem| SD["Stable Diffusion"]
-  SD --> CORE
-  CORE --> VENOM_IMG["Venom envia imagem"]
-
-  COQUI --> SESANE["SESANE (análise emocional)"]
-  SESANE --> CORE
-  SESANE --> OLLAMA_2
-  SESANE --> MODULO
-
-  CORE --> TELEGRAM["Canal Telegram"]
-  CORE --> INSTAGRAM["Canal Instagram"]
-
-  subgraph Infraestrutura
-    CORE --> POSTGRES["PostgreSQL"]
-    CORE --> REDIS["Redis"]
-    CORE --> MINIO["MinIO"]
-    CORE --> TRAEFIK["Traefik"]
-    TRAEFIK --> NGINX["NGINX"]
-  end
-
-  subgraph Admin
-    CORE --> JIRA["Jira"]
-    CORE --> JENKINS["Jenkins"]
-    JIRA --> POSTGRES
-    JENKINS --> POSTGRES
-  end
-
-  subgraph Observabilidade
-    CORE --> PROMETHEUS["Prometheus"]
-    PROMETHEUS --> GRAFANA["Grafana"]
-  end
-```
+| Nome           | Imagem/Base                     | Função                                 |
+|----------------|----------------------------------|----------------------------------------|
+| safira-core    | n8nio/n8n                        | Motor de automação                     |
+| whatsapp       | venom customizado (Node.js)      | Interface com WhatsApp via Webhook     |
+| llm-ollama     | ollama/ollama                    | Modelo de linguagem local (LLM)        |
+| whisper        | openai/whisper (via CPU, int8)   | STT (áudio → texto)                    |
+| tts            | coqui-ai/tts → agora XTTSv2      | TTS (texto → áudio)                    |
+| postgree       | postgres:16                      | Banco de dados                         |
+| wiki           | requarks/wiki:2                  | Documentação (Wiki.js substituindo Jira) |
+| redis          | redis:7                          | Cache e armazenamento leve             |
 
 ---
+
+### 🔉 Voz (Entrada e Saída)
+
+| Nome     | Função                                   | Tags |
+|----------|-------------------------------------------|------|
+| Whisper  | STT: Transcrição de voz para texto       | output, audio |
+| XTTSv2   | TTS: Conversão de texto para voz humanizada | input, audio |
+
+### 📊 Administração e Observabilidade
+
+| Nome        | Função                          | Tags |
+|-------------|----------------------------------|------|
+| Prometheus  | Coleta de métricas               | admin |
+| Grafana     | Dashboards e visualização        | admin |
+| Wiki.js     | Documentação interna do projeto  | admin |
+
+---
+
 
 ## 📂 Estrutura do Repositório
 
@@ -197,34 +135,17 @@ safira-wamgia/
 ├── build/                    # Diretório base para todos os serviços customizados
 │   ├── venom/                # Serviço WhatsApp (venom-bot + main.js + Dockerfile personalizado)
 │   ├── ollama/               # LLM local para processamento de linguagem (base: Ollama)
-│   ├── sesame/               # Agente emocional SESANE (interpretação e resposta afetiva)
 │   ├── whisper/              # STT (Speech-to-Text) com Faster-Whisper
-│   ├── coqui/                # TTS (Text-to-Speech) com Coqui TTS + API Flask
-│   ├── blip2/                # Leitor e interpretador de imagens (modelo BLIP2)
-│   ├── auto1111/             # Geração de imagens com Stable Diffusion + UI Auto1111
+│   ├── tts/                  # TTS (Text-to-Speech) com Coqui TTS + API Flask
 │   ├── jira/                 # Integração com Jira para gestão de tarefas e automações
-│   ├── jenkins/              # Jenkins para pipeline CI/CD local e integração contínua
-│   ├── prometheus/ grafana/  # Monitoramento e visualização de métricas
-│   ├── traefik/              # Load balancer e proxy reverso para os serviços internos
-│   ├── nginxs/               # Servidor web e/ou proxy para rotas específicas estáticas
-│   ├── redis/                # Banco de dados em memória (mensageria, cache, filas)
-│   ├── minio/                # Armazenamento local compatível com S3 (utilizado por IA, logs, etc.)
 │   ├── postgres/             # Banco de dados relacional PostgreSQL (n8n, sessões, histórico)
 ├── db/                       # Dados persistentes ou seeds iniciais de banco (ex: usuários, configs)
-├── docs/                     # Documentação do projeto (ex: MkDocs, Swagger, etc.)
 ├── workflows/                # Fluxos n8n reutilizáveis, templates, modelos e integrações
-├── scripts/                  # Scripts utilitários para setup, secrets, release e debugging
 ├── .env                      # Arquivo de variáveis de ambiente (auto-gerado pelo run.sh)
 ├── .env.example              # Modelo base para configuração do ambiente local
 ├── docker-compose.yml        # Orquestrador principal da stack com todos os containers
 ├── run.sh                    # Script principal que inicializa, configura e sobe toda a stack
 ```
-
-### 🧠 Observações
-- O `run.sh` cuida da criação dos arquivos `.py`, `Dockerfile`, `main.js` e `package.json` quando ausentes.
-- Serviços que exigem setup remoto (ex: Jira) exibirão uma mensagem de orientação no terminal.
-- O repositório foi projetado para funcionar de forma plug-and-play local, com baixa dependência de cloud e foco em autonomia.
-
 ---
 
 ## 🛠️ Setup Inicial
@@ -255,34 +176,6 @@ chmod +x run.sh
 ./run.sh
 ```
 
-### ⚙️ Flags disponíveis
-Você pode usar o `run.sh` com parâmetros adicionais:
-
-| Comando               | Descrição                                        |
-|----------------------|--------------------------------------------------|
-| `./run.sh`           | Sobe todos os serviços com build automático     |
-| `./run.sh --no-build`| Sobe serviços sem recompilar imagens            |
-| `./run.sh --reset`   | Derruba tudo, remove volumes e redes            |
-| `./run.sh --status`  | Mostra status atual dos serviços                |
-| `./run.sh --only-core`| Sobe apenas n8n, WhatsApp, Postgres             |
-| `./run.sh --only-ai` | Sobe somente os modelos IA (Whisper, Coqui etc) |
-
-> 🧠 O `run.sh` é seguro, modular e inteligente: roda só o necessário, e nunca executa builds ou resets desnecessários sem confirmação.
-
-```bash
-git clone https://github.com/caioross/Safira-WAMGIA.git
-cd safira-wamgia
-chmod +x setup.sh run.sh secrets.sh
-./setup.sh
-./secrets.sh
-```
-
-2. Suba os containers:
-
-```bash
-./run.sh up
-```
-
 ---
 
 ## 🌐 Endpoints
@@ -294,34 +187,15 @@ Abaixo estão listados os principais endpoints HTTP expostos pelos serviços da 
 | N8N Core             | Automação de fluxos (assistente principal)    | http://localhost:5678              |
 | Venom API (WhatsApp) | Integração com WhatsApp via venom-bot         | http://localhost:3000              |
 | LLM Ollama           | Modelo de linguagem local                     | http://localhost:11434             |
-| SESANE               | Análise emocional de voz                      | http://localhost:8003              |
 | Whisper STT          | Transcrição de áudio para texto               | http://localhost:9000              |
-| Coqui TTS            | Geração de fala a partir de texto             | http://localhost:9001              |
-| BLIP2                | Leitura e descrição de imagens                | http://localhost:9003              |
-| Stable Diffusion     | Geração de imagem via prompt textual          | http://localhost:7860              |
-| Grafana              | Dashboards e visualização de métricas         | http://localhost:3001              |
-| Prometheus           | Coletor de métricas                           | http://localhost:9090              |
-| Jenkins              | Pipeline CI/CD local                          | http://localhost:8083              |
+| TTS                  | Geração de fala a partir de texto             | http://localhost:9001              |
 | Jira                 | Gerenciamento de tarefas                      | http://localhost:8082              |
-| Traefik              | Gateway reverso para serviços HTTP            | http://localhost:8080              |
-| NGINX                | Servidor de arquivos estáticos / conteúdo     | http://localhost:8081              |
-| MinIO Console        | Interface S3 para arquivos e objetos          | http://localhost:9002              |
 
 | Componente Interno   | Descrição                                     | Porta Interna                      |
 |----------------------|-----------------------------------------------|-------------------------------------|
 | PostgreSQL           | Banco de dados relacional                     | 5432                               |
-| Redis                | Cache e pub/sub de mensagens                  | 6379                               |
 
-> 💡 Observação: Serviços internos como PostgreSQL e Redis não expõem interface web, mas são essenciais para o funcionamento interno da stack. e Redis não possuem interface HTTP, mas estão disponíveis para conexões internas entre containers.
-
----
-
-## 🔐 Secrets e Segurança
-
-Execute `./secrets.sh` para gerar os secrets obrigatórios. O script cobre:
-- PostgreSQL, Redis, MinIO
-- Tokens de API (Venom, Ollama, Supabase, etc)
-- JWTs e secrets de aplicação
+> 💡 Observação: Serviços internos como PostgreSQL não expõem interface web, mas são essenciais para o funcionamento interno da stack. e Redis não possuem interface HTTP, mas estão disponíveis para conexões internas entre containers.
 
 ---
 
@@ -333,64 +207,33 @@ Execute `./secrets.sh` para gerar os secrets obrigatórios. O script cobre:
 | `release/x.y.z`    | Versão candidata                |
 | `main`             | Versão estável                   |
 
-Scripts Bash automatizam o ciclo de releases:
-- `./push-dev.sh` → Sobe pra develop
-- `./promote-release.sh 1.2.3` → Cria release
-- `./promote-main.sh 1.2.3` → Sobe pro main com tag
-
----
-
-## 📊 Observabilidade
-
-O módulo de observabilidade da Safira garante rastreamento completo da saúde dos serviços, análise de performance e auditoria de eventos. Ele é composto por:
-
-### 📈 Coleta de Métricas
-- **Prometheus**: coleta dados de serviços com suporte a `healthchecks`, uso de CPU, memória, tempo de resposta, latência de containers e serviços expostos via Traefik ou FastAPI.
-- **Exporters customizados** podem ser adicionados para serviços específicos como PostgreSQL ou Redis, para insights avançados.
-
-### 📊 Visualização e Dashboards
-- **Grafana**: conectado ao Prometheus, apresenta dashboards em tempo real com:
-  - Status de containers e recursos
-  - Métricas de uso por serviço (n8n, LLM, TTS/STT, etc.)
-  - Uptime e erros de healthcheck
-  - Tráfego do WhatsApp via Venom
-
-> O painel default do Grafana está disponível em `http://localhost:3000` com credenciais configuradas via `secrets.sh`
-
 ---
 
 ## 🔍 Roadmap
 
-- [ ] Integração com WhatsApp via Venom
-- [ ] Pipeline de CI/CD local com GitHub Actions + scripts
-- [ ] Conversão de voz para texto (Whisper) e TTS (Coqui)
-- [ ] Geração e leitura de imagens com IA (Stable Diffusion + BLIP2)
-- [ ] Análise emocional com SESANE
-- [ ] Dashboard de métricas com Grafana + Prometheus
-- [ ] Secrets automatizados via `secrets.sh`
-- [ ] Setup completo com `run.sh`, `setup.sh`, `secrets.sh`
-- [ ] Testes unitários automatizados por serviço (pytest, ruff)
-- [ ] Testes de stress e carga em Ollama e Whisper
-- [ ] Teste de fallback de LLM secundária (ex: GPT4All)
-- [ ] Modo "dev" com auto-reload + debug isolado
-- [ ] Caching inteligente com Redis para consultas repetidas
-- [ ] Orquestração interna de agentes (modo LangChain-like)
-- [ ] Documentação de uso para colaborador/analista
-- [ ] Criação de perfil de execução leve (modo "mínimo")
-- [ ] Fallbacks para serviços de voz (STT/TTS) em caso de falha
-- [ ] Suporte a respostas multimodais nos fluxos n8n
-- [ ] Modularização do compose por perfil (admin/core/image/voz)
-- [ ] Configuração automática dos containers via script interativo (WIP)
+- [x] WhatsApp conectado com fluxo webhook estável
+- [x] Substituição do Coqui por XTTSv2
+- [x] Integração com Whisper (STT)
+- [x] Agente de decisão entre texto/áudio
+- [x] Substituição do Jira pela Wiki.js
+- [ ] Interface web para onboarding e usuários múltiplos
+- [ ] Camada de autenticação segura para agentes externos
+- [ ] Integração com Google Calendar / Trello / Email
+- [ ] Orquestrador de múltiplos fluxos simultâneos
 
 > 📌 Observação: O foco é funcionalidade local, offline-friendly e com resiliência total à falta de cloud.
 ---
 
+## 🧪 Testes Locais
+
+Recomenda-se testar:
+- Envio de mensagens de texto e áudio reais
+- Logs via `docker compose logs -f whatsapp`
+- Status via `run.sh --status`
+
 ## 📄 Licença
 
 Este projeto é **Particular**. Reprodução, distribuição ou uso sem permissão expressa está proibido.
-
-## 🚨 Discord:
-https://discord.gg/rwVdW52nz7
 
 ✨ **Happy coding!**  
 Equipe Safira WAMGIA 🔮🚀
