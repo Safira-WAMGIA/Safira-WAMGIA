@@ -64,30 +64,6 @@ A experiência de usar a Safira é como conversar com alguém que te conhece pro
 
 ---
 
-## 💰 Monetização
-A Safira será oferecida em dois modelos principais:
-- **Gratuito**: acesso básico à assistente, sem agentes especializados e com limitações de uso
-- **Premium R$ 20/mês**: acesso completo, com direito a acesso agentes personalizados pagos e gratuitos.
-- **Agentes adicionais**: planos individuais de R$9,90 a R$40, conforme a complexidade e função do agente (Médico, Agente de Midias Sociais, Agente Financeiro, Nutricionista,  e etc.))
-
----
-
-## 📣 Promoção Autônoma Fora de Pico
-
-Quando a Safira identifica que está em horários de baixa demanda ou ociosidade (ex: madrugada, fins de semana, feriados), ela entra em modo de **promoção ativa distribuída**. Neste modo, ela realiza as seguintes ações:
-
-- Acessa redes sociais como **Instagram, TikTok, Facebook, X (Twitter)**
-- Visita perfis aleatórios ou estrategicamente escolhidos com base em tags, localizações ou interesses
-- Analisa brevemente o perfil da pessoa para entender o contexto
-- Gera uma mensagem em audio e texto personalizada, natural e instigante, como:
-
-  > "Oi Fulano, vi que você é programador e fiquei curioso sobre seus projetos. Tô querendo bater um papo contigo. Me chama aqui no WhatsApp: 123456789 😄"
-
-- Essa mensagem é adaptada ao perfil visitado e nunca soa como spam genérico. A intenção é despertar **curiosidade legítima** e iniciar **conversas humanas reais** com alto potencial de conversão.
-
-Essa estratégia transforma a Safira em um verdadeiro agente de prospecção orgânica, capaz de atrair novos usuários de forma espontânea e inteligente, sem depender de anúncios pagos.
-
----
 
 ## 🧱 Arquitetura Geral (Dockerized Stack)
 
