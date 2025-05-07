@@ -59,7 +59,7 @@ services:
   llm-ollama:
     image: ollama/ollama
     container_name: Safira-Ollama
-    ports: ["11434:11434"]
+    ports: ["11435:11434"]
     networks: [safira-net]
     volumes:
       - ollama-data:/models

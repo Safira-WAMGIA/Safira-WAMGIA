@@ -27,7 +27,7 @@ create({
   multidevice: true,
   disableWelcome: true,
   headless: true,
-  browserArgs: ['--no-sandbox'],
+  browserArgs: ['--no-sandbox', '--disable-dev-shm-usage'], // --disable-dev-shm-usage is good for Docker
   folderNameToken: 'tokens',
   mkdirFolderToken: '.',
   
