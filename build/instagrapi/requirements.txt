@@ -1,0 +1,4 @@
+instagrapi
+fastapi
+uvicorn
+Pillow>=8.1.1

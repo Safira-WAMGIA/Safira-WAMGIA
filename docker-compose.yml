@@ -30,7 +30,6 @@ services:
     env_file: .env
     depends_on:
       - postgree
-      - whatsapp
       - llm-ollama
     restart: unless-stopped
     healthcheck:
@@ -39,27 +38,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
-
-  whatsapp:
-    build:
-      context: ./build/venom
-      dockerfile: Dockerfile
-    container_name: Safira-Whatsapp
-    ports: ["3000:3000"]
-    networks: [safira-net]
-    volumes:
-      - venom-data:/app/sessions
-      - venom-data:/app/tokens
-    env_file: .env
-    environment:
-      - WEBHOOK_URL=${WEBHOOK_URL}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
 
   llm-ollama:
     image: ollama/ollama
@@ -215,14 +193,6 @@ services:
       - CACHE_REDIS_PREFIX_KEY=evolution
       - CACHE_LOCAL_ENABLED=false
 
-      # - DATABASE_SAVE_DATA_INSTANCE=true
-      # - DATABASE_SAVE_DATA_NEW_MESSAGE=true
-      # - DATABASE_SAVE_MESSAGE_UPDATE=true
-      # - DATABASE_SAVE_DATA_CONTACTS=true
-      # - DATABASE_SAVE_DATA_CHATS=true
-      # - DATABASE_SAVE_DATA_LABELS=true
-      # - DATABASE_SAVE_DATA_HISTORIC=true
-
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -240,3 +210,26 @@ services:
         - '6379:6379'
       volumes:
         - redis-data:/data
+
+  instagrapi:
+    build:
+      context: ./build/instagrapi
+      dockerfile: Dockerfile
+    container_name: Safira-Instagram
+    ports:
+      - "8010:8000"
+    networks:
+      - safira-net
+    volumes:
+      - ./data/instagrapi:/app/session
+    env_file: .env
+    environment:
+      - IG_USERNAME=${IG_USERNAME}
+      - IG_PASSWORD=${IG_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
