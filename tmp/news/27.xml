@@ -4,10 +4,58 @@
         <title>Opinião</title>
         <link>https://www.gazetadopovo.com.br/opiniao/</link>
         <description>Acompanhe as principais matérias e artigos de opinião da Gazeta do Povo. Conteúdo reflexivo e de qualidade.</description>
-        <lastBuildDate>Fri, 09 May 2025 15:18:38 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 10 May 2025 21:03:23 GMT</lastBuildDate>
         <docs>http://blogs.law.harvard.edu/tech/rss</docs>
         <generator>https://www.gazetadopovo.com.br</generator>
         <atom:link href="https://www.gazetadopovo.com.br/feed/rss/opiniao.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title><![CDATA[O desafio do desenvolvimento]]></title>
+            <link>https://www.gazetadopovo.com.br/opiniao/editoriais/ranking-idh-brasil-desafio-do-desenvolvimento/</link>
+            <guid>https://www.gazetadopovo.com.br/opiniao/editoriais/ranking-idh-brasil-desafio-do-desenvolvimento/</guid>
+            <pubDate>Sat, 10 May 2025 21:02:36 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/08114242/mapa-mundi-invertido-brasil-centro-ibge-pochmann-960x540.jpg" /><br />O resultado do ranking do IDH de 2023 mantém o Brasil entre os piores da América Latina, à frente apenas de Paraguai, Bolívia e Venezuela]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/08114242/mapa-mundi-invertido-brasil-centro-ibge-pochmann-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/08114242/mapa-mundi-invertido-brasil-centro-ibge-pochmann-960x540.jpg</url>
+            </image>
+        </item>
+        <item>
+            <title><![CDATA[Mesmo sem concordar, o brasileiro paga a conta da complacência de Lula com corruptos e ditadores]]></title>
+            <link>https://www.gazetadopovo.com.br/opiniao/artigos/mesmo-sem-concordar-o-brasileiro-paga-a-conta-da-complacencia-de-lula-com-corruptos-e-ditadores/</link>
+            <guid>https://www.gazetadopovo.com.br/opiniao/artigos/mesmo-sem-concordar-o-brasileiro-paga-a-conta-da-complacencia-de-lula-com-corruptos-e-ditadores/</guid>
+            <pubDate>Fri, 09 May 2025 22:49:07 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/04/17203724/nadine-heredia-peru-960x540.jpg" /><br />A proteção de Lula a mais um aliado envolto em corrupção custou ao Brasil R$ 320 mil mais um grave arranhão em sua imagem internacional]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/04/17203724/nadine-heredia-peru-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/04/17203724/nadine-heredia-peru-960x540.jpg</url>
+            </image>
+        </item>
+        <item>
+            <title><![CDATA[Atrofia geracional: por que muitos jovens optam pela apatia  ]]></title>
+            <link>https://www.gazetadopovo.com.br/opiniao/artigos/atrofia-geracional-por-que-muitos-jovens-optam-pela-apatia/</link>
+            <guid>https://www.gazetadopovo.com.br/opiniao/artigos/atrofia-geracional-por-que-muitos-jovens-optam-pela-apatia/</guid>
+            <pubDate>Fri, 09 May 2025 22:48:59 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/09092706/jovens-960x540.jpg" /><br />Nunca foi tão necessário clamar que é preciso amar o mundo apaixonadamente, senão teremos mais uma geração de jovens e adultos sem identidade]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/09092706/jovens-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/09092706/jovens-960x540.jpg</url>
+            </image>
+        </item>
+        <item>
+            <title><![CDATA[Lula e a festa dos ditadores na Rússia]]></title>
+            <link>https://www.gazetadopovo.com.br/opiniao/editoriais/lula-e-a-festa-dos-ditadores-na-russia/</link>
+            <guid>https://www.gazetadopovo.com.br/opiniao/editoriais/lula-e-a-festa-dos-ditadores-na-russia/</guid>
+            <pubDate>Sat, 10 May 2025 02:33:31 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/09192041/lula-putin-1-960x540.jpg" /><br />Lula escolheu estar ao lado de ditaduras como a Rússia e arrasta perigosamente o Brasil para longe das democracias consolidadas.]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/09192041/lula-putin-1-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/09192041/lula-putin-1-960x540.jpg</url>
+            </image>
+        </item>
         <item>
             <title><![CDATA[Como uma base familiar sólida conduz ao sucesso acadêmico]]></title>
             <link>https://www.gazetadopovo.com.br/ideias/base-familiar-solida-sucesso-academico/</link>
@@ -246,54 +294,6 @@
             </enclosure>
             <image>
                 <url>https://media.gazetadopovo.com.br/2025/02/05110738/educacao-e-inteligencia-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Qual é o verdadeiro debate sobre alimentos ultraprocessados]]></title>
-            <link>https://www.gazetadopovo.com.br/opiniao/artigos/verdadeiro-debate-alimentos-ultraprocessados/</link>
-            <guid>https://www.gazetadopovo.com.br/opiniao/artigos/verdadeiro-debate-alimentos-ultraprocessados/</guid>
-            <pubDate>Tue, 06 May 2025 12:47:37 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/06093644/ultraprocessados-960x540.jpg" /><br />Há debates inflamados sobre os supostos alimentos ultraprocessados, mas sem deixar claro quais produtos podem ser classificados dessa forma.]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/06093644/ultraprocessados-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/05/06093644/ultraprocessados-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Populismo de Lula segura inflação. Incerteza no caso Débora Rodrigues. Conclave: o que você precisa saber]]></title>
-            <link>https://www.gazetadopovo.com.br/opiniao/bom-dia/populismo-lula-inflacao-incerteza-debora-rodrigues/</link>
-            <guid>https://www.gazetadopovo.com.br/opiniao/bom-dia/populismo-lula-inflacao-incerteza-debora-rodrigues/</guid>
-            <pubDate>Tue, 06 May 2025 01:06:00 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/04/30212446/lula-1-960x540.jpg" /><br />Presidente e Banco Central protagonizam cabo de guerra econômico. Futuro de cabeleireira é incerto. Leia na Gazeta do Povo]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/04/30212446/lula-1-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/04/30212446/lula-1-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[O Brasil que não aprende]]></title>
-            <link>https://www.gazetadopovo.com.br/opiniao/editoriais/analfabetismo-inaf-brasil-que-nao-aprende/</link>
-            <guid>https://www.gazetadopovo.com.br/opiniao/editoriais/analfabetismo-inaf-brasil-que-nao-aprende/</guid>
-            <pubDate>Tue, 06 May 2025 01:54:09 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/05192154/analfabetismo1-960x540.jpg" /><br />Indicador de Alfabetismo Funcional (Inaf), divulgado nesta semana, mostra que o Brasil ainda pode ser chamado de um país de analfabetos.]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/05192154/analfabetismo1-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/05/05192154/analfabetismo1-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Seis grandes questões sobre o conclave… e uma – a mais importante – como bônus]]></title>
-            <link>https://www.gazetadopovo.com.br/ideias/seis-questoes-conclave/</link>
-            <guid>https://www.gazetadopovo.com.br/ideias/seis-questoes-conclave/</guid>
-            <pubDate>Mon, 05 May 2025 18:41:27 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/05153155/conclave-250505-960x540.jpg" /><br />Descubra como funciona o conclave, quem participa, onde ocorre e qual o papel do Espírito Santo na escolha do novo Papa]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/05153155/conclave-250505-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/05/05153155/conclave-250505-960x540.jpg</url>
             </image>
         </item>
     </channel>

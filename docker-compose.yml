@@ -12,6 +12,10 @@ volumes:
   tts-cache:
   jira-data:
   wiki-data:
+  evolution_store:
+  evolution_instances:
+  evolution-audio: 
+  redis-data:
 
 
 services:
@@ -185,4 +189,54 @@ services:
       retries: 3
       start_period: 20s
 
+  evolution-api:
+    image: atendai/evolution-api
+    container_name: Safira-EvolutionAPI
+    ports:
+      - "8085:8080"
+    networks:
+      - safira-net
+    volumes:
+      - evolution-audio:/app/audios
+      - evolution_store:/evolution/store
+      - evolution_instances:/evolution/instances
+    environment:
+      - LICENSE_KEY=${EVOLUTION_LICENSE_KEY}
+      - INTERFACE=all
+      - WEBHOOK_URL_EVO=${WEBHOOK_URL_EVO}
 
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgree:5432/${POSTGRES_DB}?schema=public
+      - DATABASE_CONNECTION_CLIENT_NAME=SafiraEvolutionClient
+
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379/0
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_LOCAL_ENABLED=false
+
+      # - DATABASE_SAVE_DATA_INSTANCE=true
+      # - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      # - DATABASE_SAVE_MESSAGE_UPDATE=true
+      # - DATABASE_SAVE_DATA_CONTACTS=true
+      # - DATABASE_SAVE_DATA_CHATS=true
+      # - DATABASE_SAVE_DATA_LABELS=true
+      # - DATABASE_SAVE_DATA_HISTORIC=true
+
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  redis:
+      image: redis:7
+      container_name: safira-redis
+      networks:
+        - safira-net
+      ports:
+        - '6379:6379'
+      volumes:
+        - redis-data:/data
