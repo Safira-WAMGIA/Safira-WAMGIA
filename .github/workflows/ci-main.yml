@@ -42,7 +42,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build-${{ github.run_number }}
       - name: Export resolved compose
         run: docker compose config > compose-resolved-${{ github.sha }}.yml
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: compose-resolved-${{ github.sha }}
           path: compose-resolved-${{ github.sha }}.yml
