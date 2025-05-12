@@ -22,6 +22,7 @@ services:
     networks: [safira-net]
     volumes:
       - n8n-data:/home/node/.n8n
+      - ./tmp/news:/tmp/news
     env_file: .env
     depends_on:
       - postgree
