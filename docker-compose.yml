@@ -5,7 +5,6 @@ networks:
 
 volumes:
   n8n-data:
-  venom-data:
   ollama-data:
   whisper-models:
   pgdata:
@@ -70,9 +69,6 @@ services:
       WHISPER_LANGUAGE: pt
       WHISPER_DEVICE: cpu
       WHISPER_COMPUTE_TYPE: int8 
-    depends_on:
-      - safira-core
-      - llm-ollama
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
