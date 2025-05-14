@@ -4,10 +4,34 @@
         <title>Ideias</title>
         <link>https://www.gazetadopovo.com.br/ideias/</link>
         <description>Leia as notícias da editoria Ideias da Gazeta do Povo. Conteúdo informativo, reflexivo e de qualidade!</description>
-        <lastBuildDate>Sat, 10 May 2025 19:47:36 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 12 May 2025 01:04:38 GMT</lastBuildDate>
         <docs>http://blogs.law.harvard.edu/tech/rss</docs>
         <generator>https://www.gazetadopovo.com.br</generator>
         <atom:link href="https://www.gazetadopovo.com.br/feed/rss/ideias.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title><![CDATA[Entramos de penetra no aniversário de Marx na livraria mais comunista de Curitiba]]></title>
+            <link>https://www.gazetadopovo.com.br/ideias/entramos-penetra-aniversario-marx-livraria-mais-comunista-curitiba/</link>
+            <guid>https://www.gazetadopovo.com.br/ideias/entramos-penetra-aniversario-marx-livraria-mais-comunista-curitiba/</guid>
+            <pubDate>Mon, 12 May 2025 01:03:41 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/09150319/vertov1-960x540.jpg" /><br />No aniversário de 207 anos de Karl Marx, a livraria Vertov, em Curitiba, organizou uma mesa-redonada que celebrou a Rússia e a China]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/09150319/vertov1-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/09150319/vertov1-960x540.jpg</url>
+            </image>
+        </item>
+        <item>
+            <title><![CDATA[Papel-moeda como arma de guerra]]></title>
+            <link>https://www.gazetadopovo.com.br/ideias/papel-moeda-arma-guerra/</link>
+            <guid>https://www.gazetadopovo.com.br/ideias/papel-moeda-arma-guerra/</guid>
+            <pubDate>Sun, 11 May 2025 20:56:15 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/09213243/dolar-continental-1776-250509-660x372.jpg" /><br />Na Revolução Americana, o HMS Phoenix imprimiu dólares falsos para desvalorizar a moeda dos EUA e minar o esforço de guerra das colônias.]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/09213243/dolar-continental-1776-250509-660x372.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/09213243/dolar-continental-1776-250509-660x372.jpg</url>
+            </image>
+        </item>
         <item>
             <title><![CDATA[Cotidiano extraordinário: as práticas que moldaram Carlo Acutis para a santidade]]></title>
             <link>https://www.gazetadopovo.com.br/ideias/cotidiano-extraordinario-praticas-moldaram-carlo-acutis-santidade/</link>
@@ -270,30 +294,6 @@
             </enclosure>
             <image>
                 <url>https://media.gazetadopovo.com.br/2025/04/11180208/e734e87c85cd800349e9417a53d5191f617d793bw-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Frases da Semana: “O grito ‘sem anistia’ ecoa e deve ecoar”]]></title>
-            <link>https://www.gazetadopovo.com.br/ideias/frases-semana-grito-sem-anistia-ecoa-deve-ecoar/</link>
-            <guid>https://www.gazetadopovo.com.br/ideias/frases-semana-grito-sem-anistia-ecoa-deve-ecoar/</guid>
-            <pubDate>Sun, 04 May 2025 02:30:41 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/03232210/caetano-veloso-sem-anistia-250503-960x540.jpg" /><br />Nesta edição das Frases da Semana destacamos a fala do músico Caetano Veloso sobre a anistia. Leia mais na Gazeta do Povo]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/03232210/caetano-veloso-sem-anistia-250503-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/05/03232210/caetano-veloso-sem-anistia-250503-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Contra a meritocracia e contra as escolas cívico-militares: o sociólogo por trás da educação no governo Lula]]></title>
-            <link>https://www.gazetadopovo.com.br/ideias/contra-meritocracia-escolas-civico-militares-sociologo-educacao-governo-lula/</link>
-            <guid>https://www.gazetadopovo.com.br/ideias/contra-meritocracia-escolas-civico-militares-sociologo-educacao-governo-lula/</guid>
-            <pubDate>Sun, 04 May 2025 00:21:23 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/04/30093805/callegari2-660x372.jpg" /><br />Cesar Callegari combate propostas que ganharam força nos últimos anos, como o homeschooling, os vouchers e as escolas cívico-militares.]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/04/30093805/callegari2-660x372.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2025/04/30093805/callegari2-660x372.jpg</url>
             </image>
         </item>
     </channel>

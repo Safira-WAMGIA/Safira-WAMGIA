@@ -4,10 +4,22 @@
         <title>Programa Falando Abertamente</title>
         <link>https://www.gazetadopovo.com.br/tudo-sobre/falando-abertamente/</link>
         <description></description>
-        <lastBuildDate>Sun, 04 May 2025 22:10:26 GMT</lastBuildDate>
+        <lastBuildDate>Sun, 11 May 2025 22:04:20 GMT</lastBuildDate>
         <docs>http://blogs.law.harvard.edu/tech/rss</docs>
         <generator>https://www.gazetadopovo.com.br</generator>
         <atom:link href="https://www.gazetadopovo.com.br/feed/rss/tudo-sobre/falando-abertamente.xml" rel="self" type="application/rss+xml"/>
+        <item>
+            <title><![CDATA[Manifestação em Brasília e caso Ramagem escancaram crise institucional no STF]]></title>
+            <link>https://www.gazetadopovo.com.br/sem-editoria/manifestacao-brasilia-caso-ramagem-escancaram-crise-institucional-stf/</link>
+            <guid>https://www.gazetadopovo.com.br/sem-editoria/manifestacao-brasilia-caso-ramagem-escancaram-crise-institucional-stf/</guid>
+            <pubDate>Sat, 10 May 2025 00:30:03 GMT</pubDate>
+            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2025/05/09174730/Falando-Abertamente-Thumbnail-3-960x540.jpg" /><br />A comentarista Cristina Graeml explora a crise entre STF e Parlamento vista em casos políticos recentes e até nas falas do ministro Luiz Fux]]></description>
+            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2025/05/09174730/Falando-Abertamente-Thumbnail-3-960x540.jpg">
+            </enclosure>
+            <image>
+                <url>https://media.gazetadopovo.com.br/2025/05/09174730/Falando-Abertamente-Thumbnail-3-960x540.jpg</url>
+            </image>
+        </item>
         <item>
             <title><![CDATA[O roubo de 6,3 bilhões do INSS no governo Lula 3]]></title>
             <link>https://www.gazetadopovo.com.br/vozes/cristina-graeml/falando-abertamente-inss/</link>
@@ -282,18 +294,6 @@
             </enclosure>
             <image>
                 <url>https://media.gazetadopovo.com.br/2024/03/08113723/Nova-id-Cris-2-960x540.jpg</url>
-            </image>
-        </item>
-        <item>
-            <title><![CDATA[Presa no Paraguai revela como manifestantes foram incriminados]]></title>
-            <link>https://www.gazetadopovo.com.br/vozes/cristina-graeml/presa-no-paraguai-revela-como-manifestantes-foram-incriminados/</link>
-            <guid>https://www.gazetadopovo.com.br/vozes/cristina-graeml/presa-no-paraguai-revela-como-manifestantes-foram-incriminados/</guid>
-            <pubDate>Mon, 04 Mar 2024 10:33:52 GMT</pubDate>
-            <description><![CDATA[<img src="https://media.gazetadopovo.com.br/2024/03/01134337/Nova-id-Cris-1-960x540.jpg" /><br />Cristina Graeml entrevista Rieny Munhoz, comerciante presa no Paraguai, por falsas alegações. Assista na Gazeta do Povo!]]></description>
-            <enclosure type="image/jpeg" url="https://media.gazetadopovo.com.br/2024/03/01134337/Nova-id-Cris-1-960x540.jpg">
-            </enclosure>
-            <image>
-                <url>https://media.gazetadopovo.com.br/2024/03/01134337/Nova-id-Cris-1-960x540.jpg</url>
             </image>
         </item>
     </channel>
