@@ -1,0 +1,45 @@
+CONTRATO DE LICENÇA DE USUÁRIO FINAL
+Safira Assistant – versão 1.0.0  
+© 2025 Safira-WAMGIA. Todos os direitos reservados.
+
+IMPORTANTE: LEIA COM ATENÇÃO ANTES DE INSTALAR OU UTILIZAR O SOFTWARE.
+
+Ao selecionar a opção “Aceito o contrato” ou ao instalar/usar o Safira Assistant (“SOFTWARE”), você, pessoa física ou jurídica (“LICENCIADO”), concorda em ficar vinculado a todos os termos abaixo. Caso não concorde, selecione “Não aceito” e cancele a instalação.
+
+1. CONCESSÃO DE LICENÇA  
+   1.1 A LICENCIANTE concede ao LICENCIADO uma licença não exclusiva, intransferível e revogável para instalar e utilizar uma (1) cópia do SOFTWARE em um único computador.  
+   1.2 Esta licença destina-se exclusivamente a fins internos do LICENCIADO. Nenhuma cláusula concede direito de revenda, sublicença ou distribuição.
+
+2. RESTRIÇÕES  
+   2.1 É proibido, sem consentimento escrito da LICENCIANTE:  
+        a) modificar, traduzir, adaptar, descompilar, fazer engenharia reversa ou criar obras derivadas;  
+        b) remover avisos de propriedade intelectual;  
+        c) contornar mecanismos de segurança ou limites técnicos;  
+        d) alugar, arrendar, comercializar ou disponibilizar o SOFTWARE a terceiros.
+
+3. PROPRIEDADE INTELECTUAL  
+   O SOFTWARE é protegido por leis e tratados de direitos autorais. O LICENCIADO recebe apenas o direito de uso, sem qualquer transferência de titularidade.
+
+4. SUPORTE E ATUALIZAÇÕES  
+   4.1 A LICENCIANTE pode, a seu critério, fornecer atualizações ou correções.  
+   4.2 Quaisquer atualizações fornecidas ficarão sujeitas a este mesmo contrato, salvo disposição em contrário.
+
+5. GARANTIA LIMITADA  
+   O SOFTWARE é fornecido “NO ESTADO EM QUE SE ENCONTRA” (“AS IS”), sem garantias de qualquer tipo, explícitas ou implícitas, incluindo, sem limitação, garantias de comerciabilidade, adequação a uma finalidade específica ou não infração.
+
+6. LIMITAÇÃO DE RESPONSABILIDADE  
+   Em nenhuma hipótese a LICENCIANTE será responsável por danos indiretos, incidentais, consequenciais, perdas de lucros ou quaisquer outros prejuízos decorrentes do uso ou incapacidade de uso do SOFTWARE, mesmo que tenha sido avisada da possibilidade de tais danos.
+
+7. RESCISÃO  
+   7.1 Esta licença entra em vigor na data de instalação e permanecerá válida até ser rescindida.  
+   7.2 O LICENCIADO pode rescindir a qualquer momento, desinstalando e destruindo todas as cópias.  
+   7.3 A LICENCIANTE poderá rescindir imediatamente em caso de violação de qualquer cláusula. Após a rescisão, cessarão todos os direitos de uso.
+
+8. LEI APLICÁVEL E FORO  
+   Este contrato será regido pela legislação da República Federativa do Brasil. Fica eleito o foro da comarca de [SUA CIDADE/ESTADO], renunciando-se a qualquer outro, por mais privilegiado que seja.
+
+9. DISPOSIÇÕES FINAIS  
+   Se qualquer cláusula for considerada inválida, as demais permanecerão em pleno vigor. A falta de exercício de qualquer direito não implica renúncia.
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+Ao marcar “ACEITO” ou concluir a instalação, o LICENCIADO declara ter lido, compreendido e concordado com todos os termos acima.

@@ -1,0 +1,34 @@
+Bem-vindo(a) ao Safira Assistant 1.0.0
+======================================
+
+Obrigado por escolher a Safira.
+Este instalador fará o trabalho pesado por você
+Em poucos minutos a Safira estará rodando e pronta
+
+O que será instalado?
+• Docker Desktop* (caso não esteja presente ou esteja desatualizado)
+• Pilha de containers Safira:
+     – n8n (orquestração de workflows)
+     – PostgreSQL, Redis, MinIO (dados, filas, arquivos)
+     – Ollama + modelos Llama 3 (LLM local)
+     – Whisper + Coqui TTS (voz)
+     – Serviços auxiliares (, etc.)
+• Atalhos no menu Iniciar:
+     “Safira Dashboard”  |  “Parar Safira”
+
+Pré-requisitos recomendados
+• Windows 10/11 64-bit
+• CPU com virtualização habilitada
+• 16 GB de RAM (mínimo 8 GB)
+• 60 GB de espaço livre em disco
+• Conexão de internet para baixar as imagens (~5 GB)
+
+Tempo estimado de configuração: 5-10 min (dependendo da rede).
+
+Suporte & Documentação
+• Docs: https://github.com/Safira-WAMGIA/Safira-WAMGIA/wiki
+• E-mail: suporte@safira.ai
+
+Clique em **Próximo** para continuar.
+______________________________________
+*Se já houver Docker Desktop compatível, o instalador apenas validará a versão.
