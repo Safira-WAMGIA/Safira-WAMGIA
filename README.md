@@ -207,9 +207,9 @@ Recomenda-se testar:
 - Logs via `docker compose logs -f whatsapp`
 - Status via `run.sh --status`
 
-## 📄 Licença
 
-Este projeto é **Particular**. Reprodução, distribuição ou uso sem permissão expressa está proibido.
+## 🚨 Discord:
+https://discord.gg/rwVdW52nz7
 
 ✨ **Happy coding!**  
 Equipe Safira WAMGIA 🔮🚀
